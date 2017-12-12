@@ -6,3 +6,11 @@
     padding-right: 1rem;
 }
 
+
+@media screen and (min-width: 900px) {
+    .container {
+        margin:auto;
+        margin-top: 5.5em;
+        width: 50em;
+    }
+}

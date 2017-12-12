@@ -10,29 +10,56 @@ class SetColor extends Component {
 
     constructor(props) {
         super(props)
+        this.state = {showNextButton: false}
+    }
+
+    componentDidMount() {
+        this.toggleNextButton()
     }
 
 
+    toggleNextButton = () => {
+        if (this.props.getColor()) {
+            this.setState({showNextButton: true})
+        } else {
+            this.setState({showNextButton: false})    
+        }
+    }
+
+    setColor = (color, e) => {
+        const primaryColor = color.hex
+        this.props.setColor(primaryColor)
+        this.toggleNextButton()
+    }
+
     render() {
+        
+        const displayNextButton = (this.state.showNextButton) ? 'inline' : 'none'
         
         return (
             <Row>
                 <RowItem xs={12} style={{textAlign: "center"}}>
-                    <Heading size="xlarge">Time for painting!</Heading>
-                    <Heading size="xsmall" style={{color: "gray"}}>carefully pick the main color for your app</Heading>
+                    <Heading size="xlarge">Time For Painting!</Heading>
+                    <Heading size="xsmall">step 2 out of 3</Heading>
                 </RowItem>
-                <RowItem xs={12} style={{textAlign: "center"}}>
-                    <div style={ {display: "inline-flex"} }>
-                        <CirclePicker width={ 250 } circleSize={ 32 } onChangeComplete={ this.colorHasBeenSelected } />
+                <RowItem xs={12} style={{textAlign: "center", marginTop: "2rem"}}>
+                    <Heading size="xsmall" style={{color: "gray"}}>carefully pick the main color of your app</Heading>
+                    <div style={ {display: "inline-flex", marginTop: "2rem"} } >
+                        <CirclePicker width={ 250 } circleSize={ 32 } onChangeComplete={ this.setColor } color={ this.props.getColor() } />
                     </div>
                 </RowItem>
-	            <RowItem xs={12} style={{textAlign: "right", right: "25%"}}>
-                    <ButtonGroup>
-                        <Link to={ '/' }><Button>Cancel</Button></Link>
-                        <Link to={ '/new/setName' }><Button>Back</Button></Link>
-                        <Link to={ '/new/getBricks' }><Button level="info">Next</Button></Link>
-                    </ButtonGroup>
+              
+                
+                <RowItem xs={12} >
+                    <Link to={ '/new/setBricks' }><Button block style={ {display: displayNextButton} } level="info">Next</Button></Link>
                 </RowItem>
+                <RowItem xs={12} >
+                    <Link to={ '/new/setName' }><Button block>Previous</Button></Link>
+                </RowItem>
+                <RowItem xs={12} >
+                    <Link to={ '/' }><Button block >Cancel</Button></Link>
+                </RowItem>
+            
             </Row>
         )       
 

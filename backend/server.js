@@ -29,6 +29,27 @@ async function main() {
         path:'/app', 
         handler: (request, h) => {
             console.log(request.payload)
+            // save app in mongodb
+            return h.response().created()
+        }
+    })
+
+    server.route({
+        method: 'GET',
+        path:'/list/app', 
+        handler: (request, h) => {
+            console.log(request.payload)
+            // get apps from mongodb
+            return h.response().created()
+        }
+    })
+
+    server.route({
+        method: 'PUT',
+        path:'/app', 
+        handler: (request, h) => {
+            console.log(request.payload)
+            // save app in mongodb
             return h.response().created()
         }
     })

@@ -16,8 +16,7 @@ class New extends Component {
         return (
             <Row>
 	            <RowItem xs={12} style={{textAlign: "center"}}>
-                    <img src={constructionImage} />
-                    <br/>
+                    {/*<img src={constructionImage} />*/}
                     <Link to={ '/new/setName' } >
                         <Button level="success" size="large">Create A New App</Button>
                     </Link>

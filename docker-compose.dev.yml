@@ -1,0 +1,30 @@
+version: '3'
+services:
+
+  api:
+    build: .
+    ports:
+      - 7000:8000
+    volumes:
+      - ./backend/:/home/node/mag-engine
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:3.0-wheezy
+    ports:
+      - 27017
+    volumes:
+       - ./backend/database:/data/db
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./frontend/dist:/dist
+    depends_on:
+      - api
+
+    ports:
+      - 5555:80
+    

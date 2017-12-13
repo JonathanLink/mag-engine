@@ -13,7 +13,10 @@ class SetBricks extends Component {
 
     constructor(props) {
         super(props)
-        this.state = {showNextButton: false}
+        this.state = {
+            showNextButton: false,
+            showErrorNotification: false
+        }
     }
 
     componentDidMount() {
@@ -38,18 +41,22 @@ class SetBricks extends Component {
     }
 
     saveAppFileDescr = async () => {
+       
+        this.setState( {showErrorNotification: false} )
         console.log(JSON.stringify(this.props.getNewApp()))
         let response
         try {
-            response = await fetch("/app", { method: "POST", body: JSON.stringify(this.props.getNewApp()) })
+            response = await fetch("/api/list/app", { method: "GET" })
         } catch (e) {
+            console.log(e)
             return
         }
+        
         let status = await response.status
         if (status !== 201) {
-            console.log('4044')
+            this.setState( {showErrorNotification: true} )
         } else {
-
+            console.log(">" + response.json())
         }
     }
 
@@ -62,14 +69,14 @@ class SetBricks extends Component {
 
             <Row>
 
-                <NotificationAlert>
-                    <Notification level="error" onClose={() => { console.log("Clicked on close"); }}>
+                <NotificationAlert style={ {visibility: (this.state.showErrorNotification) ? "visible" : "hidden"} }>
+                    <Notification level="error" onClose={() => { this.setState( {showErrorNotification: false} ) }}>
                         mag-engine server failed to handle the request
                     </Notification>
                 </NotificationAlert>
 
                 <RowItem xs={ 12 } style={ {textAlign: "center"} }>
-                    <Heading size="xlarge">Which feature do you need?</Heading>
+                    <Heading size="xlarge">Which feature do you need??</Heading>
                     <Heading size="xsmall">last step!</Heading>
                 </RowItem>
                 <RowItem xs={ 12 } style={ {left: "40%"} } >

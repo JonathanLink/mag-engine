@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const server = Hapi.Server({ 
     host: '0.0.0.0', 
     port: 8000,
-    routes: {cors: {origin: ['http://localhost:7000'] }}
+    routes: {cors: {origin: ['http://localhost:7000', 'http://localhost:5555'] }}
 })
 
 
@@ -22,8 +22,6 @@ let brickRoutes
 
 async function main() {
 
-   
-    
     server.route({
         method: 'POST',
         path:'/app', 
@@ -40,20 +38,39 @@ async function main() {
         handler: (request, h) => {
             console.log(request.payload)
             // get apps from mongodb
-            return h.response().created()
+            return 'app1, app2'
         }
     })
 
     server.route({
         method: 'PUT',
-        path:'/app', 
+        path:'/start/{appId}', 
         handler: (request, h) => {
             console.log(request.payload)
             // save app in mongodb
             return h.response().created()
         }
     })
- 
+
+    server.route({
+        method: 'PUT',
+        path:'/pause/{appId}', 
+        handler: (request, h) => {
+            console.log(request.payload)
+            // save app in mongodb
+            return h.response().created()
+        }
+    })
+
+    server.route({
+        method: 'DELETE',
+        path:'/app/{appId}', 
+        handler: (request, h) => {
+            console.log(request.payload)
+            // save app in mongodb
+            return h.response().created()
+        }
+    })
 
      // Create a server with a host and port
     try {

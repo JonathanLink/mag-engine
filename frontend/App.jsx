@@ -28,7 +28,7 @@ class App extends Component {
             newApp: {
                 id: "",
                 name: "",
-                primaryColor: "",
+                color: "",
                 bricks: []
             }
         }

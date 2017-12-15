@@ -26,7 +26,6 @@ class App extends Component {
         super()
         this.state = {
             newApp: {
-                id: "",
                 name: "",
                 color: "",
                 bricks: []
@@ -40,14 +39,14 @@ class App extends Component {
         )
     }
 
-    setId = () => {
+    /*setId = () => {
         this.state.newApp.id = this.uuidv4()
         console.log(this.state.newApp)
     }
 
     getAppId = () => {
         return this.state.newApp.id
-    }
+    }*/
 
     setName = (name) => {
         this.state.newApp.name = name
@@ -102,7 +101,7 @@ class App extends Component {
                             <Route exact path='/' component={New}/>
                             <Route exact path='/new/setName'
                                 render={ (props) => {
-                                        this.setId()
+                                        //this.setId()
                                         props.setName = this.setName
                                         props.getName = this.getName
                                         return React.createElement(SetName, props)

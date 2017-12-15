@@ -10,48 +10,79 @@ class List extends Component {
 
     constructor(props) {
         super(props)
-        this.state = {showNextButton: false}
+        this.state = {showNextButton: false, list: []}
     }
 
     componentDidMount() {
-        
+        this.getAppList()
     }
 
     toggleApp = (checked, e) => {
        // console.log(this.props.getNewApp())
     }
 
+    getAppList = async () => {
+
+        let response
+        try {
+            response = await fetch("/api/list/app", { method: "GET" })
+        } catch (e) {
+            console.log(e)
+            return
+        }
+        
+        this.setState({ list: await response.json() })
+
+        console.log(this.state.list)
+    }
+
+    toggleApp = async (checked, event) => {
+        console.log(event.target.name + " - " + checked)
+        let response
+        try {
+            response = await fetch("/api/start/" + event.target.name, { method: "PUT" })
+        } catch (e) {
+            console.log(e)
+            return
+        }
+    }
+
 
     render() {
         
         const displayNextButton = (this.state.showNextButton) ? 'inline' : 'none'
-
+        const listApp = this.state.list.map(app => {
+                    return (
+                        <Row key={ app._id } style={ {textAlign: "center"} }>
+                            <RowItem xs={8}>
+                                { app.name }
+                            </RowItem>
+                            <RowItem xs={4}>
+                                <Checkbox name={ app._id } isSwitch onChange={ this.toggleApp } ></Checkbox>
+                            </RowItem>
+                        </Row>
+                    )
+                })
+        console.log(listApp)
         return (
             <div>
                 <Row>
-                    <RowItem xs={12} style={{textAlign: "center"}}>
+                    <RowItem xs={12} style={ {textAlign: "center"} }>
                         <Heading size="xlarge">All Your App Are Listed Here</Heading>
                         <Heading size="xsmall">total 2 (1 online, 1 offline)</Heading>
                     </RowItem>
                 </Row>
-            
-                <Row styles={ {background: "red"} }>
-                    <RowItem xs={8}>
-                        app name
-                    </RowItem>
-                    <RowItem xs={4}>
-                        <Checkbox name="appId" isSwitch onChange={ this.toggleApp } >online/offline</Checkbox>
-                    </RowItem>
-                </Row>
 
-                <Row styles={ {background: "red"} }>
+                {listApp}
+
+               {/*<Row style={ {textAlign: "center"} }>
                     <RowItem xs={8}>
                         app name
                     </RowItem>
                     <RowItem xs={4}>
-                    <Loader type="circle">starting...</Loader>
+                        <Loader type="circle">starting...</Loader>
                     </RowItem>
-                </Row>
+                </Row>*/}
 
             </div>
         )       

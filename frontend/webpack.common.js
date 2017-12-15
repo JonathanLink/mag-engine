@@ -78,13 +78,7 @@ let config = {
             minRatio: 0.8
         }),
         new BundleAnalyzerPlugin({analyzerMode: 'static', openAnalyzer: false})
-    ],
-    devServer: {
-        contentBase: [path.resolve(__dirname, './dist')],
-        host: 'localhost',
-        historyApiFallback: true,
-        port: 10000
-    }
+    ]
 }
 
 module.exports = config

@@ -1,12 +1,15 @@
 version: '3'
 services:
 
-  api:
-    build: .
+  server:
+    build: ./backend
     ports:
-      - 7000:8000
+      - 12000:8000
     volumes:
-      - ./backend/:/home/node/mag-engine
+      - ./backend/:/home/node/mag-server
+      - /usr/bin/docker-compose:/usr/bin/docker-compose
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/home/node/mag-server
     depends_on:
       - mongo
 
@@ -21,10 +24,9 @@ services:
     image: nginx
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./frontend/dist:/dist
+      - ./app/dist:/dist
     depends_on:
-      - api
-
+      - server
     ports:
-      - 5555:80
+      - 11000:80
     

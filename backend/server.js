@@ -1,11 +1,16 @@
 'use strict';
 const Hapi = require('hapi')
 const mongoose = require('mongoose')
+mongoose.Promise = global.Promise
+const app = require('./src/api/models/app.js')
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
+
 
 const server = Hapi.Server({ 
     host: '0.0.0.0', 
     port: 8000,
-    routes: {cors: {origin: ['http://localhost:7000', 'http://localhost:5555'] }}
+    routes: {cors: {origin: ['http://localhost:5555'] }}
 })
 
 
@@ -25,9 +30,8 @@ async function main() {
     server.route({
         method: 'POST',
         path:'/app', 
-        handler: (request, h) => {
-            console.log(request.payload)
-            // save app in mongodb
+        handler: async (request, h) => {
+            await app.create(JSON.parse(request.payload))
             return h.response().created()
         }
     })
@@ -35,19 +39,32 @@ async function main() {
     server.route({
         method: 'GET',
         path:'/list/app', 
-        handler: (request, h) => {
+        handler: async (request, h) => {
             console.log(request.payload)
-            // get apps from mongodb
-            return 'app1, app2'
+            let list = await app.find({})
+            console.log(list)
+            return list
         }
     })
 
     server.route({
         method: 'PUT',
         path:'/start/{appId}', 
-        handler: (request, h) => {
-            console.log(request.payload)
-            // save app in mongodb
+        handler: async (request, h) => {
+            console.log('app ' + request.params.appId + " will start")
+            
+            async function startBrickService() {
+                try {
+                    const { stdout, stderr } = await exec('cd bricks && docker-compose up -d')
+                    console.log('stdout:', stdout)
+                    console.log('stderr:', stderr)
+                    return stdout
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+            let stdout = await startBrickService()
+
             return h.response().created()
         }
     })
@@ -72,20 +89,18 @@ async function main() {
         }
     })
 
-     // Create a server with a host and port
+    // Create a server with a host and port
     try {
         await server.start()
         console.log('mag-engine server running at:', server.info.uri)
     } catch(err) {
         console.log(err)
-    } 
+    }
+    
 
     // Open connection to mongo database
     const databaseURL = 'mongodb://mongo/mag-engine'
     await openDatabaseConnection(databaseURL)
-
-
-  
 
 }
 

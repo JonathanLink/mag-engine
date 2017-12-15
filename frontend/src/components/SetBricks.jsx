@@ -46,7 +46,7 @@ class SetBricks extends Component {
         console.log(JSON.stringify(this.props.getNewApp()))
         let response
         try {
-            response = await fetch("/api/list/app", { method: "GET" })
+            response = await fetch("/api/app", { method: "POST", body: JSON.stringify(this.props.getNewApp()) })
         } catch (e) {
             console.log(e)
             return
@@ -56,7 +56,7 @@ class SetBricks extends Component {
         if (status !== 201) {
             this.setState( {showErrorNotification: true} )
         } else {
-            console.log(">" + response.json())
+            console.log(">" + response.blob())
         }
     }
 
@@ -76,7 +76,7 @@ class SetBricks extends Component {
                 </NotificationAlert>
 
                 <RowItem xs={ 12 } style={ {textAlign: "center"} }>
-                    <Heading size="xlarge">Which feature do you need??</Heading>
+                    <Heading size="xlarge">Which feature do you need?</Heading>
                     <Heading size="xsmall">last step!</Heading>
                 </RowItem>
                 <RowItem xs={ 12 } style={ {left: "40%"} } >

@@ -12,6 +12,7 @@ class Articles extends Component {
     
     constructor() {
         super()
+        console.log('init articles')
         this.state = {articles: []}
     }
 
@@ -20,6 +21,7 @@ class Articles extends Component {
     }
 
     async componentDidMount() {
+        
         if (this.state.articles.length  == 0) {
             let response
             try {

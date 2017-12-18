@@ -3,7 +3,7 @@ import Articles from './components/Articles'
 
 export default {
   brickName: 'redactor',
-  brickMenuName: 'News',
+  brickMenuName: 'Articles',
   routes: [{
     path: '/articles',
     component: Articles,

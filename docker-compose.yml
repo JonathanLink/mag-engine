@@ -10,11 +10,11 @@ services:
       - /usr/bin/docker:/usr/bin/docker
       - /usr/bin/docker-compose:/usr/bin/docker-compose
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./containers:/home/node/mag-engine/containers
-      - ~/Documents/mag/bricks/redactor/backend:/home/node/mag-engine/bricks
-
+      - ~/Documents/mag/bricks/redactor/backend:/home/node/mag-engine/bricks # tmp
+      - ./apps:/home/node/mag-engine/apps
     depends_on:
       - mongo
+    entrypoint: ./entrypoint.sh
 
   mongo:
     image: mongo:3.0-wheezy

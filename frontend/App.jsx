@@ -27,6 +27,7 @@ class App extends Component {
         this.state = {
             newApp: {
                 name: "",
+                appName: "",
                 color: "",
                 bricks: []
             }
@@ -50,6 +51,13 @@ class App extends Component {
 
     setName = (name) => {
         this.state.newApp.name = name
+        const formatNameToAppName = (n) => {
+            const toUpperCase = (s) => {
+                return s.substr(0, 1).toUpperCase() + s.substr(1)
+            }
+            return n.split(' ').filter(i => i !== '').reduce( (a, i) => a + toUpperCase(i) )
+        } 
+        this.state.newApp.appName = formatNameToAppName(name)
         console.log(this.state.newApp)
     }
 

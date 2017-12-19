@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const schema = mongoose.Schema({
     id: String,
     name: String,
+    appName: String,
     color: String,
     brick: [String],
     state: { type: String, enum: ['running', 'paused', 'stopped'], default: 'stopped' },

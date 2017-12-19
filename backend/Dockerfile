@@ -1,5 +1,6 @@
 FROM node:carbon
-#USER node # not good to comment (this for security reason)
+# USER node 
+# not good to comment (this for security reason)
 ENV workdir /home/node/mag-engine
 RUN mkdir -p ${workdir}
 WORKDIR ${workdir}
@@ -10,5 +11,6 @@ WORKDIR ${workdir}
 #RUN rm .npmrc
 #COPY . .
 
-CMD npm start
+# CMD npm start
+
 

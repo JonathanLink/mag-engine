@@ -2,10 +2,13 @@
 const Hapi = require('hapi')
 const mongoose = require('mongoose')
 mongoose.Promise = global.Promise
-const app = require('./src/api/models/app.js')
+const appModel = require('./src/api/models/app.js')
+const Boom = require('boom')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
-
+const fs = require('fs')
+const Promise = require('bluebird')
+Promise.promisifyAll(fs);
 
 const server = Hapi.Server({ 
     host: '0.0.0.0', 
@@ -31,7 +34,7 @@ async function main() {
         method: 'POST',
         path:'/app', 
         handler: async (request, h) => {
-            await app.create(JSON.parse(request.payload))
+            await appModel.create(JSON.parse(request.payload))
             return h.response().created()
         }
     })
@@ -41,7 +44,7 @@ async function main() {
         path:'/list/app', 
         handler: async (request, h) => {
             console.log(request.payload)
-            let list = await app.find({})
+            let list = await appModel.find({})
             console.log(list)
             return list
         }
@@ -51,8 +54,37 @@ async function main() {
         method: 'PUT',
         path:'/start/{appId}', 
         handler: async (request, h) => {
-            console.log('app ' + request.params.appId + " will start")
+
+            // 0. Get parameters
+            const appId = request.params.appId
+            let app
+            try {
+                app = await appModel.findOne( { _id: appId } )
+            } catch (e) {
+                console.log(e)
+                return Boom.badImplementation('internal error: cannot start app (step 0)')
+            } 
+
+
+            // 1. Create a new folder for the app
+            try {
+                await fs.mkdirAsync(__dirname + '/apps/' + app.appName)
+            } catch (e) {
+                console.log(e)
+                return Boom.badImplementation('internal error: cannot start app (step 1)')
+            } 
+       
+
             
+            // 2. Export app config in a json file and save it in the folder
+
+
+            // 3. docker-compose up
+
+
+            // 4. inside the new container: git clone bricks inside volume
+
+
             async function startBrickService() {
                 try {
                     const { stdout, stderr } = await exec('cd bricks && docker-compose up -d')
@@ -63,18 +95,7 @@ async function main() {
                     console.log(e)
                 }
             }
-            let stdout = await startBrickService()
-
-            return h.response().created()
-        }
-    })
-
-    server.route({
-        method: 'PUT',
-        path:'/pause/{appId}', 
-        handler: (request, h) => {
-            console.log(request.payload)
-            // save app in mongodb
+            await startBrickService()
             return h.response().created()
         }
     })

@@ -4,14 +4,12 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon --ignore apps/ -L server.js "
+    "start": "nodemon -L server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "boom": "^7.1.1",
     "hapi": "^17.1.1",
     "mongoose": "^4.13.6"
   },

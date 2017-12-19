@@ -67,32 +67,44 @@ async function main() {
 
 
             // 1. Create a new folder for the app
+            let appPath = __dirname + '/apps/' + app.appName
             try {
-                await fs.mkdirAsync(__dirname + '/apps/' + app.appName)
+                await fs.mkdirAsync(appPath)
             } catch (e) {
                 console.log(e)
                 return Boom.badImplementation('internal error: cannot start app (step 1)')
             } 
-       
 
-            
-            // 2. Export app config in a json file and save it in the folder
+            // 2. Copy mag-server files for the new app 
+            try {
+                const magServerPath =  __dirname + '/containers/mag-server'
+                const { stdout, stderr } = await exec(`cp -r ${magServerPath} ${appPath}`)
+                console.log('stdout:', stdout)
+                console.log('stderr:', stderr)
+                appPath = appPath + '/mag-server'
+            } catch (e) {
+                console.log(e)
+                return Boom.badImplementation('internal error: cannot start app (step 2)')
+            }
 
+            // 3. Export app config in a json file and save it in the folder
+            try {
+                await fs.writeFileSync(appPath + '/app.json', app , 'utf-8'); 
+            } catch (e) {
+                console.log(e)
+                return Boom.badImplementation('internal error: cannot start app (step 3)')
+            } 
 
-            // 3. docker-compose up
-
-
-            // 4. inside the new container: git clone bricks inside volume
-
-
+            // 4. docker-compose up
             async function startBrickService() {
                 try {
-                    const { stdout, stderr } = await exec('cd bricks && docker-compose up -d')
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose up -d`)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
                     return stdout
                 } catch (e) {
                     console.log(e)
+                    return Boom.badImplementation('internal error: cannot start app (step 4)')
                 }
             }
             await startBrickService()

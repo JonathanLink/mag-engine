@@ -1,5 +1,5 @@
 FROM node:carbon
-USER node
+#USER node
 ENV workdir /home/node/mag-server
 RUN mkdir -p ${workdir}
 WORKDIR ${workdir}
@@ -10,5 +10,5 @@ WORKDIR ${workdir}
 #RUN rm .npmrc
 #COPY . .
 
-CMD npm start
+#CMD npm start
 

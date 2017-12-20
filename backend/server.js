@@ -65,7 +65,7 @@ async function main() {
                 return Boom.badImplementation('internal error: cannot start app (step 0)')
             } 
 
-
+            //let appPath = __dirname + '/apps/' + app.appName + '/mag-server'
             // 1. Create a new folder for the app
             let appPath = __dirname + '/apps/' + app.appName
             try {
@@ -93,12 +93,12 @@ async function main() {
             } catch (e) {
                 console.log(e)
                 return Boom.badImplementation('internal error: cannot start app (step 3)')
-            } 
+            }
 
             // 4. docker-compose up
             async function startBrickService() {
                 try {
-                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose up -d`)
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose down && docker-compose build --no-cache && docker-compose  up`) // -p ${app.appName}
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
                     return stdout

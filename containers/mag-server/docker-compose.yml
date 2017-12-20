@@ -6,26 +6,26 @@ services:
     ports:
       - 12000:8000
     volumes:
-      - ./backend/:/home/node/mag-server
+      - /home/jlink/Documents/mag/mag-engine/apps/appDemo/mag-server/backend:/home/node/mag-server #absolute path!
+      - /usr/bin/docker:/usr/bin/docker
       - /usr/bin/docker-compose:/usr/bin/docker-compose
       - /var/run/docker.sock:/var/run/docker.sock
-
     depends_on:
       - mongo
+    entrypoint: ./entrypoint.sh
 
   mongo:
     image: mongo:3.0-wheezy
     ports:
       - 27017
     volumes:
-       - ./backend/database:/data/db
+       - /home/jlink/Documents/mag/mag-engine/apps/appDemo/mag-server/backend/database:/data/db       #absolute path!
 
   nginx:
     image: nginx
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./frontend/app/dist:/dist
+      - /home/jlink/Documents/mag/mag-engine/apps/appDemo/mag-server/nginx/conf.d:/etc/nginx/conf.d   #absolute path!
+      - /home/jlink/Documents/mag/mag-engine/apps/appDemo/mag-server/frontend/app/dist:/dist          #absolute path!
     depends_on:
       - server
     ports:

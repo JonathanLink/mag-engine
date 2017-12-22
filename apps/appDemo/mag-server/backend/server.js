@@ -118,9 +118,8 @@ async function init() {
         }
       
         menuBrick = menuBrick + `<ListItem><Link onClick={this.toggleMenu} to={"${brickInfo.entry}"}>${brickInfo.menuName}</Link></ListItem>\\n`
-
         routeBrick = routeBrick + `{${brickName}.routes.map((route, index) => <Route key={ index } exact path={ route.path }  render={ (props) => { props.registerBrickView = this.registerBrickView; return React.createElement(route.component, props); } } /> )}`
-        console.log("menuBrick2: "+menuBrick)
+
         // generate webpack (app / admin)
         webpackEntries = webpackEntries + `,redactor: "./bricks/${brickName}/components/${brickInfo.entryComponent}"\\n`
         webpackChunks = webpackChunks + `, "${brickName}"`
@@ -129,16 +128,23 @@ async function init() {
     
    
     try {
+
+        // generate shell.js
+        await exec(`rm frontend/app/entry/shell.js & cp frontend/app/entry/shell.BASE.js frontend/app/entry/shell.js`)
+        let placeholder = "//@SW_PATH@"
+        let swpath = `./sw.js`
+        await exec(`sed -i 's#${placeholder}#${swpath}#g' frontend/app/entry/shell.js`)
+
         // generate shell/App.js (app / admin)
         await exec(`rm frontend/app/entry/App.jsx & cp frontend/app/entry/AppBASE.jsx frontend/app/entry/App.jsx`)
         
-        let placeholder = "//@AUTO-GENERATED-IMPORT@"
+        placeholder = "//@AUTO-GENERATED-IMPORT@"
         await exec(`sed -i 's#${placeholder}#${importBrick}#g' frontend/app/entry/App.jsx`)
         
         placeholder = "//@AUTO-GENERATED-MENU@"
         
         await exec(`sed -i 's#${placeholder}#${menuBrick}#g' frontend/app/entry/App.jsx`)
-        console.log("menuBrick3: "+menuBrick)
+
         placeholder = "//@AUTO-GENERATED-ROUTE@"
         await exec(`sed -i 's#${placeholder}#${routeBrick}#g' frontend/app/entry/App.jsx`)
         
@@ -151,6 +157,12 @@ async function init() {
         await exec(`sed -i 's#${placeholder}#${publicPath}#g' frontend/app/webpack.common.js`)
         placeholder = "//@CHUNKS@"
         await exec(`sed -i 's#${placeholder}#${webpackChunks}#g' frontend/app/webpack.common.js`)
+
+        await exec(`rm frontend/app/webpack.prod.js & cp frontend/app/webpack.prod.BASE.js frontend/app/webpack.prod.js`)
+        placeholder = "//@SW_PREFIX_URL@"
+        let swPrefixURL= '/' + app.appName
+        swPrefixURL = swPrefixURL.toLowerCase()
+        await exec(`sed -i 's#${placeholder}#${swPrefixURL}#g' frontend/app/webpack.prod.js`)
 
         // webpack 
         await exec(`cd frontend/app && webpack --config webpack.prod.js`)        

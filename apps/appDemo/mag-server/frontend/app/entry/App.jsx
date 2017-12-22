@@ -53,7 +53,7 @@ class App extends Component {
     }
 
     registerBrickView = (path, history) => {
-        this.setState( {isBackButtonVisible: !('/appdemo' === path)} ) // (brick.routes[0].path
+        this.setState( {isBackButtonVisible: !('/appdemo/' === path)} ) // (brick.routes[0].path
         this.setState({history: history})
     }
 

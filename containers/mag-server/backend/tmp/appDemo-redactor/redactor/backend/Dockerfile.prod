@@ -1,0 +1,13 @@
+FROM node:carbon
+USER node
+ENV workdir /home/node/brickdev
+RUN mkdir -p ${workdir}
+WORKDIR ${workdir}
+
+COPY . .
+
+CMD npm start
+
+# check eureka page that port for that module is not already taken!
+EXPOSE 9000    
+

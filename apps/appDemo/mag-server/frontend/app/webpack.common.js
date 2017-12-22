@@ -77,8 +77,7 @@ let config = {
             test: /\.js$|\.css$|\.html$|\.eot?.+$|\.ttf?.+$|\.woff?.+$|\.svg?.+$/,
             threshold: 10240,
             minRatio: 0.8
-        }),
-        new BundleAnalyzerPlugin({analyzerMode: 'static', openAnalyzer: false})
+        })
     ]
 }
 

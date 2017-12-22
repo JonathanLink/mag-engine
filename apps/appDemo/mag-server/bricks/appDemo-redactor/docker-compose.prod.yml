@@ -1,0 +1,18 @@
+version: '3'
+services:
+
+  api:
+    build: .
+    ports:
+      - 9000:8000
+    volumes:
+      - /home/jlink/Documents/mag/mag-engine/apps/appDemo/mag-server/bricks/appDemo-redactor:/home/node/brickdev # absolute path
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:3.0-wheezy
+    ports:
+      - 27017
+    volumes:
+      - /home/jlink/Documents/mag/mag-engine/apps/appDemo/mag-server/bricks/appDemo-redactor/database:/data/db # absolute path

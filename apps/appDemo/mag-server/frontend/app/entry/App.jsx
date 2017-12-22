@@ -18,11 +18,9 @@ import Home from './Home'
 import 'sq-web-icons/icons.css'
 import './styles.css'
 
-{ /* AUTO-GENERATED-CODE-IMPORT-START */ }
+import redactor from "../bricks/redactor/brick.js"
 
-import redactor from '../bricks/redactor/brick.js'
 
-{ /* AUTO-GENERATED-CODE-IMPORT-END */ }
 
 class App extends Component {
 
@@ -96,13 +94,8 @@ class App extends Component {
                                 </div>
                                 <div className="Drawer__content">
                                     <List size="large">
-
-                                        { /* AUTO-GENERATED-CODE-MENU-START */ }
-
-                                        <ListItem><Link onClick={this.toggleMenu} to={'/appdemo'}><b>Home</b></Link></ListItem>
-                                        <ListItem><Link onClick={this.toggleMenu} to={'/articles'}>{ redactor.brickMenuName }</Link></ListItem>
-                                        
-                                        { /* AUTO-GENERATED-CODE-MENU-END */ }
+                                        <ListItem><Link onClick={this.toggleMenu} to={'/appdemo'}><b>Home!</b></Link></ListItem>
+                                        <ListItem><Link onClick={this.toggleMenu} to={"/articles"}>Articles</Link></ListItem>
 
                                     </List>
                                 </div>
@@ -116,8 +109,6 @@ class App extends Component {
                         >
 
 
-                            { /* AUTO-GENERATED-CODE-ROUTE-START */ }
-
                             <Route path='/appdemo'  
                                 render={ (props) => {
                                         props.registerBrickView = this.registerBrickView
@@ -126,17 +117,7 @@ class App extends Component {
                                 }
                             />
 
-                            {redactor.routes.map((route, index) => 
-                                <Route key={ index } exact path={ route.path }  
-                                    render={ (props) => {
-                                            props.registerBrickView = this.registerBrickView
-                                            return React.createElement(route.component, props)
-                                        }
-                                    }
-                                />
-                            )}
-
-                            { /* AUTO-GENERATED-CODE-ROUTE-END */ }
+                            {redactor.routes.map((route, index) => <Route key={ index } exact path={ route.path }  render={ (props) => { props.registerBrickView = this.registerBrickView; return React.createElement(route.component, props); } } /> )}
 
                         </AnimatedSwitch>
                     </div>

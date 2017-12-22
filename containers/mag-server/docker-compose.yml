@@ -4,7 +4,7 @@ services:
   server:
     build: ./backend
     ports:
-      - 12000:8000
+      - 12001:8000
     volumes:
       - /home/jlink/Documents/mag/mag-engine/apps/appDemo/mag-server/backend:/home/node/mag-server #absolute path!
       - /usr/bin/docker:/usr/bin/docker
@@ -29,5 +29,5 @@ services:
     depends_on:
       - server
     ports:
-      - 11000:80
+      - 11001:80
     

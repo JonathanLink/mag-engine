@@ -5,7 +5,7 @@ mongoose.Promise = global.Promise
 
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
-
+const fs = util.promisify(require('fs'))
 
 const server = Hapi.Server({ 
     host: '0.0.0.0', 
@@ -31,6 +31,21 @@ server.route({
     }
 })
 
+async function init() {
+    // read app.json
+    let app = await fs.readFile('../app.json', 'utf8')
+    console.log(app)
+    // for each 
+        // brick git clone
+        // mv files in app/src
+        // mv file in admin/src
+        // docker-compose up
+    // generate shell/App.js
+    // generate nginx conf 
+    // webpack 
+    // restart nginx
+}
+
 
 // Start the server
 async function start() {
@@ -47,4 +62,6 @@ async function start() {
     console.log('Server running at:', server.info.uri)
 }
 
-start()
+
+init()
+//start()

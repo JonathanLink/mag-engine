@@ -6,9 +6,6 @@ const WorkboxBuildWebpackPlugin = require('workbox-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 let config = {
-    output: {
-        publicPath: '/dev/'
-    },
     devtool: 'cheap-module-source-map',
     plugins: [
         new Webpack.DefinePlugin({
@@ -37,7 +34,7 @@ let config = {
             skipWaiting: true,
             runtimeCaching: [
                 {
-                    urlPattern: new RegExp('http://localhost:8008/api/brick'),
+                    urlPattern: new RegExp('.*/api/brick'),
                     handler: 'staleWhileRevalidate'
                 }
             ]

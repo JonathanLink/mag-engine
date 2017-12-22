@@ -89,7 +89,7 @@ async function main() {
 
             // 3. Export app config in a json file and save it in the folder
             try {
-                await fs.writeFileSync(appPath + '/app.json', app , 'utf-8'); 
+                await fs.writeFileSync(appPath + '/backend/app.json', JSON.stringify(app) , 'utf-8'); 
             } catch (e) {
                 console.log(e)
                 return Boom.badImplementation('internal error: cannot start app (step 3)')

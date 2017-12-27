@@ -80,7 +80,7 @@ class SetBricks extends Component {
                     <Heading size="xsmall">last step!</Heading>
                 </RowItem>
                 <RowItem xs={ 12 } style={ {left: "40%"} } >
-                    <Checkbox name="article" onChange={ this.setBricks } defaultChecked={ this.props.getBricks().indexOf('article') > -1 } >Articles</Checkbox>
+                    <Checkbox name="redactor" onChange={ this.setBricks } defaultChecked={ this.props.getBricks().indexOf('redactor') > -1 } >Articles</Checkbox>
                     <Checkbox name="survey" disabled onChange={ this.setBricks } defaultChecked={ this.props.getBricks().indexOf('survey') > -1} >Surveys</Checkbox>
                 </RowItem>
 	           

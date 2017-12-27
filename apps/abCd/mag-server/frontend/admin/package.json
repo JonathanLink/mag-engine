@@ -1,11 +1,10 @@
 {
-  "name": "sample2",
+  "name": "mag-pwa",
   "version": "1.0.0",
   "description": "",
   "main": "",
   "scripts": {
-    "prod": "webpack --config webpack.prod.js",
-    "dev": "webpack --config webpack.common.js --watch"
+    "build-prod": "webpack --config webpack.prod.js"
   },
   "author": "Jonathan Link",
   "license": "ISC",
@@ -29,7 +28,7 @@
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "style-loader": "^0.18.2",
     "url-loader": "^0.6.1",
-    "webpack": "^3.10.0",
+    "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.9.1",
     "webpack-dev-server": "^2.9.1",
     "webpack-merge": "^4.1.0",
@@ -38,13 +37,11 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "react": "^16.1.1",
-    "react-color": "^2.13.8",
     "react-dom": "^16.0.0",
     "react-router-dom": "^4.2.2",
     "react-router-transition": "^1.1.2",
     "regenerator-runtime": "^0.11.0",
     "sq-web-components-core-react": "^2.0.0",
-    "sq-web-components-core-theme": "^2.0.2",
     "sq-web-icons": "^1.0.2"
   }
 }

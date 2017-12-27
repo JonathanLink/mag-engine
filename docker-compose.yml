@@ -12,10 +12,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./containers:/home/node/mag-engine/containers
       - ./apps:/home/node/mag-engine/apps
-
     depends_on:
       - mongo
     entrypoint: ./entrypoint.sh
+    environment:
+      - BASE_PATH=/home/jlink/Documents/
 
   mongo:
     image: mongo:3.0-wheezy

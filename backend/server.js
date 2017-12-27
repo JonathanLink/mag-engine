@@ -34,7 +34,12 @@ async function main() {
         method: 'POST',
         path:'/app', 
         handler: async (request, h) => {
-            await appModel.create(JSON.parse(request.payload))
+            console.log(JSON.parse(request.payload))
+            try {
+                await appModel.create(JSON.parse(request.payload))
+            } catch (e) {
+                console.log(e)
+            }
             return h.response().created()
         }
     })
@@ -45,8 +50,8 @@ async function main() {
         handler: async (request, h) => {
             console.log(request.payload)
             let list = await appModel.find({})
-            console.log(list)
-            return list
+            console.log(JSON.stringify(list))
+            return JSON.stringify(list)
         }
     })
 
@@ -54,10 +59,11 @@ async function main() {
         method: 'PUT',
         path:'/start/{appId}', 
         handler: async (request, h) => {
+            
 
             // 0. Get parameters
             const appId = request.params.appId
-            let app
+            var app
             try {
                 app = await appModel.findOne( { _id: appId } )
             } catch (e) {
@@ -78,14 +84,18 @@ async function main() {
             // 2. Copy mag-server files for the new app 
             try {
                 const magServerPath =  __dirname + '/containers/mag-server'
-                const { stdout, stderr } = await exec(`cp -r ${magServerPath} ${appPath}`)
-                console.log('stdout:', stdout)
-                console.log('stderr:', stderr)
+                await exec(`cp -r ${magServerPath} ${appPath}`)
                 appPath = appPath + '/mag-server'
             } catch (e) {
                 console.log(e)
                 return Boom.badImplementation('internal error: cannot start app (step 2)')
             }
+
+            // Generate port number of nginx and server container + save it in app object
+            const MIN_PORT_NUMBER = 49152
+            const MAX_PORT_NUMBER = 65535
+            const serverPortNumber = Math.floor(Math.random() * (MAX_PORT_NUMBER - MIN_PORT_NUMBER) ) + MIN_PORT_NUMBER  
+            const nginxPortNumber = Math.floor(Math.random() * (MAX_PORT_NUMBER - MIN_PORT_NUMBER) ) + MIN_PORT_NUMBER  
 
             // 3. Export app config in a json file and save it in the folder
             try {
@@ -95,7 +105,23 @@ async function main() {
                 return Boom.badImplementation('internal error: cannot start app (step 3)')
             }
 
-            // 4. docker-compose up
+            // 4. generate docker-compose.yml for the fresh new mag-server container
+            await exec(`rm ${appPath + '/docker-compose.yml'} & cp ${appPath + '/docker-compose.base.yml'} ${appPath + '/docker-compose.yml'}`)
+            let placeholder = '@MAG_SERVER_SERVER_PORT@'
+            await exec(`sed -i 's#${placeholder}#${serverPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
+            placeholder = '@MAG_SERVER_NGINX_PORT@'
+            await exec(`sed -i 's#${placeholder}#${nginxPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
+            placeholder = '@MAG_ENGINE_BASE_PATH@'
+            const magBasePath = process.env.BASE_PATH
+            await exec(`sed -i 's#${placeholder}#${magBasePath}#g' ${appPath + '/docker-compose.yml'}`)
+            placeholder = '@APP_NAME@'
+            await exec(`sed -i 's#${placeholder}#${app.appName}#g' ${appPath + '/docker-compose.yml'}`)
+            placeholder = '@SERVER_PORT_NUMBER@'
+            await exec(`sed -i 's#${placeholder}#${serverPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
+            placeholder = '@NGINX_PORT_NUMBER@'
+            await exec(`sed -i 's#${placeholder}#${nginxPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
+            
+            // 5. docker-compose up
             async function startBrickService() {
                 try {
                     const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose down && docker-compose build --no-cache && docker-compose  up`) // -p ${app.appName}

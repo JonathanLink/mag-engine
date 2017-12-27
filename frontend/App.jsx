@@ -57,7 +57,9 @@ class App extends Component {
             }
             return n.split(' ').filter(i => i !== '').reduce( (a, i) => a + toUpperCase(i) )
         } 
-        this.state.newApp.appName = formatNameToAppName(name)
+        if (name.length > 1) {
+            this.state.newApp.appName = formatNameToAppName(name)
+        }
         console.log(this.state.newApp)
     }
 

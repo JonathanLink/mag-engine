@@ -11,13 +11,14 @@ const extractLess = new ExtractTextPlugin({
 
 let config = {
     entry: {
-        shell:  ['babel-polyfill', './shell.js'],
-        new:  './src/components/New.jsx'
+        shell:  ['babel-polyfill', './entry/shell.js'],
+        redactor:  './bricks/redactor/components/Articles.jsx'
     },
     output: {
         path: path.resolve(__dirname, './dist'),
         filename: '[name].chunk.js',
-        chunkFilename: '[name]-chunk.js'
+        chunkFilename: '[name]-chunk.js',
+        publicPath: '/'
     },
     devtool: 'eval-source-map',
     resolve: {
@@ -66,8 +67,8 @@ let config = {
         extractLess,
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            chunks: ['vendor', 'shell', 'new'],
-            template: './index.html'
+            chunks: ['vendor', 'shell', 'redactorZ'],
+            template: './entry/index.html'
         }),
         new CompressionPlugin({
             asset: '[path].gz[query]',
@@ -77,7 +78,13 @@ let config = {
             minRatio: 0.8
         }),
         new BundleAnalyzerPlugin({analyzerMode: 'static', openAnalyzer: false})
-    ]
+    ],
+    devServer: {
+        contentBase: [path.resolve(__dirname, './dist'), path.resolve(__dirname, './entry/sq-web-components-core-theme')],
+        host: 'localhost',
+        historyApiFallback: true,
+        port: 8091
+    }
 }
 
 module.exports = config

@@ -1,9 +1,0 @@
-{ "_id": "5a38e92ae0981e014ab54f86",
-  "name": "app demo",
-  "appName":"appDemo",
-  "color": "#00bcd4",
-  "__v": 0,
-  "updated": "2017-12-19T10:25:46.198Z",
-  "created": "2017-12-19T10:25:46.198Z",
-  "state": "stopped",
-  "brick": ["redactor"] }

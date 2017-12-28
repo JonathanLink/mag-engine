@@ -74,37 +74,37 @@ async function init() {
         }*/
         //if (false) { 
         try {
-            const {stdout, stderr} = await exec(`cd tmp && cp -r ${brickRepos[brickName]} ${app.appName + '-' + brickName}`)
+            const {stdout, stderr} = await exec(`cd tmp && cp -r ${brickRepos[brickName]} ${brickName}`)
         } catch(e) {
             console.log(e)
         }
         
         // mv files in app/src
         try {
-            const {stdout, stderr} = await exec(`mv tmp/${app.appName + '-' + brickName}/frontend/app/src/brick frontend/app/bricks/${brickName}`)
+            const {stdout, stderr} = await exec(`mv tmp/${brickName}/frontend/app/src/brick frontend/app/bricks/${brickName}`)
         } catch(e) {
             console.log(e)
         }
 
         // mv files in admin/src
         try {
-            const {stdout, stderr} = await exec(`mv tmp/${app.appName + '-' + brickName}/frontend/admin/src/brick frontend/admin/bricks/${brickName}`)
+            const {stdout, stderr} = await exec(`mv tmp/${brickName}/frontend/admin/src/brick frontend/admin/bricks/${brickName}`)
         } catch(e) {
             console.log(e)
         }
 
         // mv brick backend in bricks
         try {
-            const {stdout, stderr} = await exec(`mv tmp/${app.appName + '-' + brickName}/backend bricks/${app.appName + '-' + brickName}`)
+            const {stdout, stderr} = await exec(`mv tmp/${brickName}/backend bricks/${brickName}`)
         } catch(e) {
             console.log(e)
         }
 
         // generate docker-compose for backend
         let placeholder = "@APP_NAME@"
-        await exec(`sed -i 's#${placeholder}#${app.appName}#g' bricks/${app.appName + '-' + brickName}/docker-compose.prod.yml`) 
+        await exec(`sed -i 's#${placeholder}#${app.appName}#g' bricks/${brickName}/docker-compose.prod.yml`) 
         placeholder = "@BASE_PATH@"
-        await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' bricks/${app.appName + '-' + brickName}/docker-compose.prod.yml`)    
+        await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' bricks/${brickName}/docker-compose.prod.yml`)    
     //}
         // generate imports for app/entry/App.jsx
         importBrick =  importBrick + `import ${brickName} from "../bricks/${brickName}/brick.js"\\n`
@@ -193,7 +193,7 @@ async function init() {
             // docker-compose up
             try {
                 console.log("DOCKER COMPOSE UP")
-                await exec(`cd bricks/${app.appName + '-' + brickName} && docker-compose -f docker-compose.prod.yml up --build -d`)
+                await exec(`cd bricks/${brickName} && docker-compose -f docker-compose.prod.yml -p ${app.appName} up --build -d`)
                 //console.log(await exec(`cd ./bricks/abCd-redactor && docker-compose -f docker-compose.prod.yml up --build -d`))
             } catch(e) {
                 console.log(e)

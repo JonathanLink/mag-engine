@@ -73,19 +73,20 @@ async function main() {
 
             //let appPath = __dirname + '/apps/' + app.appName + '/mag-server'
             // 1. Create a new folder for the app
-            let appPath = __dirname + '/apps/' + app.appName
+           /* let appPath = __dirname + '/apps/' + app.appName
             try {
                 await fs.mkdirAsync(appPath)
             } catch (e) {
                 console.log(e)
                 return Boom.badImplementation('internal error: cannot start app (step 1)')
-            } 
+            } */
 
             // 2. Copy mag-server files for the new app 
+            let appPath = __dirname + '/apps/' + app.appName
             try {
                 const magServerPath =  __dirname + '/containers/mag-server'
                 await exec(`cp -r ${magServerPath} ${appPath}`)
-                appPath = appPath + '/mag-server'
+                //appPath = appPath + '/mag-server'
             } catch (e) {
                 console.log(e)
                 return Boom.badImplementation('internal error: cannot start app (step 2)')

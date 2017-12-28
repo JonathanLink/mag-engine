@@ -120,6 +120,8 @@ async function main() {
             await exec(`sed -i 's#${placeholder}#${serverPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
             placeholder = '@NGINX_PORT_NUMBER@'
             await exec(`sed -i 's#${placeholder}#${nginxPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
+            placeholder = '@BASE_PATH@'
+            await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' ${appPath + '/docker-compose.yml'}`)
             
             // 5. docker-compose up
             async function startBrickService() {

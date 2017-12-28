@@ -65,14 +65,14 @@ async function init() {
     let webpackEntries = ''
     let webpackChunks = ''
 
-    app.bricks.forEach( async brickName => {
+       app.bricks.forEach( async brickName => {
         // brick git clone (npm issue + proxy + .git folder permission issue later when mv)
         /*try {
             const {stdout, stderr} = await exec(`cd tmp && git clone ${brickRepos[brickName]}`)
         } catch(e) {
             console.log(e)
         }*/
-        
+        //if (false) { 
         try {
             const {stdout, stderr} = await exec(`cd tmp && cp -r ${brickRepos[brickName]} ${app.appName + '-' + brickName}`)
         } catch(e) {
@@ -95,7 +95,7 @@ async function init() {
 
         // mv brick backend in bricks
         try {
-            const {stdout, stderr} = await exec(`mv tmp/${app.appName + '-' + brickName}/backend/ bricks/${app.appName + '-' + brickName}`)
+            const {stdout, stderr} = await exec(`mv tmp/${app.appName + '-' + brickName}/backend bricks/${app.appName + '-' + brickName}`)
         } catch(e) {
             console.log(e)
         }
@@ -105,7 +105,7 @@ async function init() {
         await exec(`sed -i 's#${placeholder}#${app.appName}#g' bricks/${app.appName + '-' + brickName}/docker-compose.prod.yml`) 
         placeholder = "@BASE_PATH@"
         await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' bricks/${app.appName + '-' + brickName}/docker-compose.prod.yml`)    
-
+    //}
         // generate imports for app/entry/App.jsx
         importBrick =  importBrick + `import ${brickName} from "../bricks/${brickName}/brick.js"\\n`
 
@@ -127,39 +127,42 @@ async function init() {
 
     })
     
-   
+
     try {
 
         // generate shell.js
-        await exec(`rm frontend/app/entry/shell.js & cp frontend/app/entry/shell.BASE.js frontend/app/entry/shell.js`)
+        await exec(`rm frontend/app/entry/shell.js && cp frontend/app/entry/shell.BASE.js frontend/app/entry/shell.js`)
         let placeholder = "//@SW_PATH@"
-        let swpath = `./sw.js`
+        let swpath = `./${app.appName.toLowerCase()}/sw.js`
         await exec(`sed -i 's#${placeholder}#${swpath}#g' frontend/app/entry/shell.js`)
 
         // generate shell/App.js (app / admin)
-        await exec(`rm frontend/app/entry/App.jsx & cp frontend/app/entry/AppBASE.jsx frontend/app/entry/App.jsx`)
+        await exec(`rm frontend/app/entry/App.jsx && cp frontend/app/entry/AppBASE.jsx frontend/app/entry/App.jsx`)
         
         placeholder = "//@AUTO-GENERATED-IMPORT@"
         await exec(`sed -i 's#${placeholder}#${importBrick}#g' frontend/app/entry/App.jsx`)
         
         placeholder = "//@AUTO-GENERATED-MENU@"
-        
         await exec(`sed -i 's#${placeholder}#${menuBrick}#g' frontend/app/entry/App.jsx`)
 
         placeholder = "//@AUTO-GENERATED-ROUTE@"
         await exec(`sed -i 's#${placeholder}#${routeBrick}#g' frontend/app/entry/App.jsx`)
+
+        placeholder = "@HOMEPAGE@"
+        await exec(`sed -i 's#${placeholder}#${app.appName.toLowerCase()}#g' frontend/app/entry/App.jsx`)
+        
         
         // generate webpack (app / admin)
-        await exec(`rm frontend/app/webpack.common.js & cp frontend/app/webpack.common.BASE.js frontend/app/webpack.common.js`)
+        await exec(`rm frontend/app/webpack.common.js && cp frontend/app/webpack.common.BASE.js frontend/app/webpack.common.js`)
         placeholder = "//@ENTRIES@"
         await exec(`sed -i 's#${placeholder}#${webpackEntries}#g' frontend/app/webpack.common.js`)
         placeholder = "//@PUBLIC_PATH@"
-        const publicPath = `"/appdemo"`
+        const publicPath = `"/${app.appName.toLowerCase()}"`
         await exec(`sed -i 's#${placeholder}#${publicPath}#g' frontend/app/webpack.common.js`)
         placeholder = "//@CHUNKS@"
         await exec(`sed -i 's#${placeholder}#${webpackChunks}#g' frontend/app/webpack.common.js`)
 
-        await exec(`rm frontend/app/webpack.prod.js & cp frontend/app/webpack.prod.BASE.js frontend/app/webpack.prod.js`)
+        await exec(`rm frontend/app/webpack.prod.js && cp frontend/app/webpack.prod.BASE.js frontend/app/webpack.prod.js`)
         placeholder = "//@SW_PREFIX_URL@"
         let swPrefixURL= '/' + app.appName
         swPrefixURL = swPrefixURL.toLowerCase()
@@ -167,9 +170,10 @@ async function init() {
 
         // webpack 
         await exec(`cd frontend/app && webpack --config webpack.prod.js`)        
-
+       
         // update nginx route
-        await exec(`rm nginx/conf.d/default.conf & cp nginx/conf.d/default.base nginx/conf.d/default.conf`)
+       
+        await exec(`rm nginx/conf.d/default.conf && cp nginx/conf.d/default.base nginx/conf.d/default.conf`)
 
         placeholder = "@NGINX_APP_SHORT_NAME@"
         let nginAppName= app.appName
@@ -188,9 +192,9 @@ async function init() {
     app.bricks.forEach( async brickName => {
             // docker-compose up
             try {
-                const {stdout, stderr} = await exec(`cd /home/node/mag-server/bricks/${app.appName + '-' + brickName} && docker-compose -f docker-compose.prod.yml up --build -d`)
-                console.log(stdout)
-                console.log(stderr)
+                console.log("DOCKER COMPOSE UP")
+                await exec(`cd bricks/${app.appName + '-' + brickName} && docker-compose -f docker-compose.prod.yml up --build -d`)
+                //console.log(await exec(`cd ./bricks/abCd-redactor && docker-compose -f docker-compose.prod.yml up --build -d`))
             } catch(e) {
                 console.log(e)
             }

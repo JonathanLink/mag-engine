@@ -9,7 +9,7 @@ server {
         gzip_static on;
     }
     
-    @NGINX_BRICK_API@
+    # @NGINX_BRICK_API@
     
     location /@NGINX_APP_SHORT_NAME@/api {
         rewrite ^/api(.*)$ $1 break;

@@ -93,7 +93,7 @@ class App extends Component {
                                 </div>
                                 <div className="Drawer__content">
                                     <List size="large">
-                                        <ListItem><Link onClick={this.toggleMenu} to={'/appdemo'}><b>Home!</b></Link></ListItem>
+                                        <ListItem><Link onClick={this.toggleMenu} to={'/@HOMEPAGE@'}><b>Home!</b></Link></ListItem>
                                         //@AUTO-GENERATED-MENU@
                                     </List>
                                 </div>

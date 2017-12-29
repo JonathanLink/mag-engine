@@ -31,6 +31,10 @@ server.route({
     }
 })
 
+async function wait(ms) {
+    await new Promise(resolve => setTimeout(() => resolve(), ms));
+}
+
 async function init() {
     console.log("init")
     // read app.json
@@ -126,6 +130,10 @@ async function init() {
         webpackChunks = webpackChunks + `, "${brickName}"`
 
     })
+
+    console.log("wait")
+    await wait(8000);
+    console.log("ok")
     
 
     try {
@@ -189,11 +197,14 @@ async function init() {
         console.log(e)
     }
 
+   
+
     app.bricks.forEach( async brickName => {
             // docker-compose up
             try {
                 console.log("DOCKER COMPOSE UP")
-                await exec(`cd bricks/${brickName} && docker-compose -f docker-compose.prod.yml -p ${app.appName} up --build -d`)
+                //await exec(`docker exec -it ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`) // THE PROBLEM IS HERE!!!
+                await exec(`cd bricks/${brickName} && docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml -p ${app.appName} up --build -d`)
                 //console.log(await exec(`cd ./bricks/abCd-redactor && docker-compose -f docker-compose.prod.yml up --build -d`))
             } catch(e) {
                 console.log(e)

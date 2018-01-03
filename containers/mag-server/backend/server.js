@@ -69,6 +69,8 @@ async function init() {
     let webpackEntries = ''
     let webpackChunks = ''
 
+    let nginxBrickAPIRoutes = ''
+
        app.bricks.forEach( async brickName => {
         // brick git clone (npm issue + proxy + .git folder permission issue later when mv)
         /*try {
@@ -128,6 +130,9 @@ async function init() {
         // generate webpack (app / admin)
         webpackEntries = webpackEntries + `,redactor: "./bricks/${brickName}/components/${brickInfo.entryComponent}"\\n`
         webpackChunks = webpackChunks + `, "${brickName}"`
+
+        // nginx brick api routes
+        nginxBrickAPIRoutes = nginxBrickAPIRoutes + `location /${app.appName.toLowerCase()}/api/brick/${brickName} { \\n\\t\\t rewrite ^/${app.appName.toLowerCase()}(.*)$ $1 break; \\n\\t\\t proxy_pass http://${app.appName.toLowerCase()}_${brickName}_api_1:8000; \\n\\t\\t proxy_http_version 1.1; \\n\\t\\t proxy_set_header Upgrade $http_upgrade; \\n\\t\\t proxy_set_header Connection "upgrade"; \\n\\t\\t proxy_set_header Host $host; \\n\\t\\t proxy_cache_bypass $http_upgrade; \\n\\t}\\n` 
 
     })
 
@@ -191,7 +196,9 @@ async function init() {
         placeholder = "@SERVER_APP_SERVER_PORT@"
         await exec(`sed -i 's#${placeholder}#${process.env.SERVER_PORT_NUMBER}#g' nginx/conf.d/default.conf`)      
            
-        
+        // nginx api bricks
+        placeholder = "@NGINX_BRICK_API@"
+        await exec(`sed -i 's#${placeholder}#${nginxBrickAPIRoutes}#g' nginx/conf.d/default.conf`)
 
     } catch(e) {
         console.log(e)
@@ -203,9 +210,9 @@ async function init() {
             // docker-compose up
             try {
                 console.log("DOCKER COMPOSE UP")
-                //await exec(`docker exec -it ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`) // THE PROBLEM IS HERE!!!
+                //await exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`)
                 await exec(`cd bricks/${brickName} && docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml -p ${app.appName} up --build -d`)
-                //console.log(await exec(`cd ./bricks/abCd-redactor && docker-compose -f docker-compose.prod.yml up --build -d`))
+                await exec(`docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -p :80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
             } catch(e) {
                 console.log(e)
             }

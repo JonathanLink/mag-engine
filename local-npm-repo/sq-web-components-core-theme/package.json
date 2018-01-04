@@ -1,0 +1,42 @@
+{
+  "_from": "sq-web-components-core-theme",
+  "_id": "sq-web-components-core-theme@2.0.2",
+  "_inBundle": false,
+  "_integrity": "sha1-ziBHAiAZppm9jKL1F/yorKb5wQg=",
+  "_location": "/sq-web-components-core-theme",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "sq-web-components-core-theme",
+    "name": "sq-web-components-core-theme",
+    "escapedName": "sq-web-components-core-theme",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://npm.bank.swissquote.ch/repository/npm/sq-web-components-core-theme/-/sq-web-components-core-theme-2.0.2.tgz",
+  "_shasum": "ce2047022019a699bd8ca2f517fca8aca6f9c108",
+  "_spec": "sq-web-components-core-theme",
+  "_where": "/home/jlink/Documents/mag/mag-engine/frontend",
+  "bundleDependencies": false,
+  "deprecated": false,
+  "devDependencies": {
+    "crafty": "1.0.2",
+    "crafty-preset-maven": "1.0.0",
+    "crafty-preset-postcss": "1.0.2",
+    "crafty-runner-gulp": "1.0.2",
+    "deep-equal": "^1.0.1"
+  },
+  "name": "sq-web-components-core-theme",
+  "scripts": {
+    "build": "crafty run",
+    "deploy": "node deploy.js",
+    "watch": "crafty watch"
+  },
+  "version": "2.0.2"
+}

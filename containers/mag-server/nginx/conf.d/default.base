@@ -11,15 +11,15 @@ server {
     
     @NGINX_BRICK_API@
     
-    location /@NGINX_APP_SHORT_NAME@/api {
-        rewrite ^/api(.*)$ $1 break;
-        proxy_pass http://server:@SERVER_APP_SERVER_PORT@;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
+    #location /@NGINX_APP_SHORT_NAME@/api {
+    #    rewrite ^/api(.*)$ $1 break;
+    #    proxy_pass http://server:@SERVER_APP_SERVER_PORT@;
+    #    proxy_http_version 1.1;
+    #    proxy_set_header Upgrade $http_upgrade;
+    #    proxy_set_header Connection 'upgrade';
+    #    proxy_set_header Host $host;
+    #    proxy_cache_bypass $http_upgrade;
+    #}
 
     
 

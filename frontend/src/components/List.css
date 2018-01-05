@@ -1,0 +1,16 @@
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+.loader {
+    margin-top: 1rem;
+}
+
+.checkbox {
+    margin-top: 1rem;
+    margin-right: 1rem;
+}

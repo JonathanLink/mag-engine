@@ -17,7 +17,6 @@ class SetColor extends Component {
         this.toggleNextButton()
     }
 
-
     toggleNextButton = () => {
         if (this.props.getColor()) {
             this.setState({showNextButton: true})

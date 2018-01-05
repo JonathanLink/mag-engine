@@ -5,20 +5,25 @@ import Button from "sq-web-components-core-react/forms/Button"
 import Heading from "sq-web-components-core-react/elements/Heading"
 import Checkbox from "sq-web-components-core-react/forms/Checkbox"
 import Loader from "sq-web-components-core-react/elements/Loader"
+import "./List.css"
 
 class List extends Component {
 
     constructor(props) {
         super(props)
-        this.state = {showNextButton: false, list: []}
+        this.state = {  
+            showNextButton: false,
+            list: []
+        }
+        this.messages = {
+            "stopped": "offline",
+            "running": "online",
+            "installing": "installing..."
+        }
     }
 
     componentDidMount() {
         this.getAppList()
-    }
-
-    toggleApp = (checked, e) => {
-       // console.log(this.props.getNewApp())
     }
 
     getAppList = async () => {
@@ -31,17 +36,32 @@ class List extends Component {
             return
         }
         
-        this.setState({ list: await response.json() })
+        let list = await response.json()
+        list.forEach((app) => {
+            app.switchButtonVisibility = "visible"
+            app.loadingVisibility = "hidden"
+            app.stateMessage = "offline"
+        })
 
-        console.log(this.state.list)
+        this.setState({ list: list })
+
     }
 
-    toggleApp = async (checked, event) => {
+    toggleApp = async (checked, event, index) => {
         console.log(event.target.name + " - " + checked)
+
+        let list = this.state.list
+        console.log(list)
+        list[index].switchButtonVisibility = (list[index].switchButtonVisibility === "visible") ? "hidden" : "visible"
+        list[index].loadingVisibility = (list[index].loadingVisibility === "visible") ? "hidden" : "visible"
+        list[index].stateMessage = this.messages[app.state]
+        console.log(list[index])
+        this.setState({ list: list })
+
         let response
         try {
             const appId = event.target.name
-            response = await fetch("/api/start/" + appId, { method: "PUT" })
+            //response = await fetch("/api/start/" + appId, { method: "PUT" })
         } catch (e) {
             console.log(e)
             return
@@ -52,24 +72,32 @@ class List extends Component {
     render() {
         
         const displayNextButton = (this.state.showNextButton) ? "inline" : "none"
-        const listApp = this.state.list.map(app => {
+
+        
+
+        const listApp = this.state.list.map( (app, index) => {
                     return (
-                        <Row key={ app._id } >
+                        <Row key={ index } >
                             <RowItem xs={8}>
                                 { app.name }
+                                <br/>
+                                <small>{ this.state.list[index].stateMessage }</small>
                             </RowItem>
-                            <RowItem xs={4} style={ {textAlign: "right", paddingTop: "0.5em"} }>
-                                <Checkbox name={ app._id } isSwitch onChange={ this.toggleApp } ></Checkbox>
+                            <RowItem xs={4} style={ {textAlign: "right"} }>
+                                
+                                <Checkbox className={ this.state.list[index].switchButtonVisibility + " checkbox" } name={ app._id } isSwitch onChange={ (checked, event) => this.toggleApp(checked, event, index) } ></Checkbox>
+                                <Loader className={ this.state.list[index].loadingVisibility + " loader" } type="dot"></Loader>
+                                   
                             </RowItem>
                         </Row>
                     )
                 })
-        console.log(listApp)
+        
         return (
             <div>
                 <Row>
                     <RowItem xs={12} style={ {textAlign: "center"} }>
-                        <Heading size="xlarge">All Your App Are Listed Here</Heading>
+                        <Heading size="xlarge">All Your App Are Listed Here:</Heading>
                         { /*<Heading size="xsmall">total 2 (1 online, 1 offline)</Heading> */ }
                     </RowItem>
                 </Row>

@@ -57,7 +57,31 @@ async function main() {
 
     server.route({
         method: 'PUT',
+        path:'/state/{appId}/{state}', 
+        handler: async (request, h) => {
+            
+        }
+    })
+
+    server.route({
+        method: 'PUT',
         path:'/start/{appId}', 
+        handler: async (request, h) => {
+            
+        }
+    })
+
+    server.route({
+        method: 'PUT',
+        path:'/stop/{appId}', 
+        handler: async (request, h) => {
+            
+        }
+    })
+
+    server.route({
+        method: 'PUT',
+        path:'/install/{appId}', 
         handler: async (request, h) => {
             
 
@@ -70,16 +94,6 @@ async function main() {
                 console.log(e)
                 return Boom.badImplementation('internal error: cannot start app (step 0)')
             } 
-
-            //let appPath = __dirname + '/apps/' + app.appName + '/mag-server'
-            // 1. Create a new folder for the app
-           /* let appPath = __dirname + '/apps/' + app.appName
-            try {
-                await fs.mkdirAsync(appPath)
-            } catch (e) {
-                console.log(e)
-                return Boom.badImplementation('internal error: cannot start app (step 1)')
-            } */
 
             // 2. Copy mag-server files for the new app 
             let appPath = __dirname + '/apps/' + app.appName

@@ -59,7 +59,15 @@ async function main() {
         method: 'PUT',
         path:'/state/{appId}/{state}', 
         handler: async (request, h) => {
-            
+            const appId = request.params.appId
+            const state = request.params.state
+            try {
+                await appModel.update({_id: appId}, {$set: {state: state}})
+            } catch (e) {
+                console.log(e)
+                throw Boom.unsupportedMediaType(e)
+            }
+            return h.response()
         }
     })
 
@@ -67,7 +75,31 @@ async function main() {
         method: 'PUT',
         path:'/start/{appId}', 
         handler: async (request, h) => {
-            
+            const appId = request.params.appId
+            let app
+            try {
+                app = await appModel.findOne( { _id: appId } )
+            } catch (e) {
+                console.log(e)
+                return Boom.badImplementation('internal error: cannot start app (step 0)')
+            } 
+
+            async function startWebApp(app) {
+                console.log('startWebApp')
+                try {
+                    let appPath = __dirname + '/apps/' + app.appName
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose start`)
+                    console.log('stdout:', stdout)
+                    console.log('stderr:', stderr)
+                    return stdout
+                } catch (e) {
+                    console.log(e)
+                    return Boom.badImplementation('internal error: cannot start webapp')
+                }
+            }
+
+            await startWebApp(app)
+            return h.response()
         }
     })
 
@@ -75,7 +107,31 @@ async function main() {
         method: 'PUT',
         path:'/stop/{appId}', 
         handler: async (request, h) => {
-            
+            const appId = request.params.appId
+            let app
+            try {
+                app = await appModel.findOne( { _id: appId } )
+            } catch (e) {
+                console.log(e)
+                return Boom.badImplementation('internal error: cannot stop app (step 0)')
+            } 
+
+            async function stopWebApp(app) {
+                console.log('stopWebApp')
+                try {
+                    let appPath = __dirname + '/apps/' + app.appName
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose stop`)
+                    console.log('stdout:', stdout)
+                    console.log('stderr:', stderr)
+                    return stdout
+                } catch (e) {
+                    console.log(e)
+                    return Boom.badImplementation('internal error: cannot stop webapp')
+                }
+            }
+
+            await stopWebApp(app)
+            return h.response()
         }
     })
 
@@ -141,7 +197,7 @@ async function main() {
             // 5. docker-compose up
             async function startBrickService() {
                 try {
-                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose down && docker-compose build --no-cache && docker-compose  up`) // -p ${app.appName}
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose down --rmi all -v --remove-orphans && docker-compose build --no-cache && docker-compose  up`) // -p ${app.appName}
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
                     return stdout

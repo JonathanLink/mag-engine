@@ -6,7 +6,7 @@ const schema = mongoose.Schema({
     appName: String,
     color: String,
     bricks: [String],
-    state: { type: String, enum: ['running', 'paused', 'stopped'], default: 'stopped' },
+    state: { type: String, enum: ['uninstalled', 'installing', 'starting', 'running', 'stopping' ,'stopped', 'deleting'], default: 'uninstalled' },
     created: { type: Date, default: Date.now },
     updated: { type: Date, default: Date.now },
 })

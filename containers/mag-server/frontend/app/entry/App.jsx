@@ -18,8 +18,6 @@ import Home from './Home'
 import 'sq-web-icons/icons.css'
 import './styles.css'
 
-import redactor from "../bricks/redactor/brick.js"
-
 
 
 class App extends Component {
@@ -52,8 +50,8 @@ class App extends Component {
         }
     }
 
-    registerBrickView = (path, history) => {
-        this.setState( {isBackButtonVisible: !('/appdemo/' === path)} ) // (brick.routes[0].path
+    registerBrickView = (history, isEntryPoint=false) => {
+        this.setState( {isBackButtonVisible: !isEntryPoint } ) 
         this.setState({history: history})
     }
 
@@ -94,7 +92,7 @@ class App extends Component {
                                 </div>
                                 <div className="Drawer__content">
                                     <List size="large">
-                                        <ListItem><Link onClick={this.toggleMenu} to={'/appdemo'}><b>Home!</b></Link></ListItem>
+                                        { /*<ListItem><Link onClick={this.toggleMenu} to={'/'}><b>Home</b></Link></ListItem>*/ }
                                         <ListItem><Link onClick={this.toggleMenu} to={"/articles"}>Articles</Link></ListItem>
 
                                     </List>
@@ -109,7 +107,7 @@ class App extends Component {
                         >
 
 
-                            <Route path='/appdemo'  
+                            <Route path='/'  
                                 render={ (props) => {
                                         props.registerBrickView = this.registerBrickView
                                         return React.createElement(Home, props)
@@ -117,8 +115,7 @@ class App extends Component {
                                 }
                             />
 
-                            {redactor.routes.map((route, index) => <Route key={ index } exact path={ route.path }  render={ (props) => { props.registerBrickView = this.registerBrickView; return React.createElement(route.component, props); } } /> )}
-
+                           
                         </AnimatedSwitch>
                     </div>
                 </div> 

@@ -13,11 +13,14 @@ import Row, {RowItem} from 'sq-web-components-core-react/collections/Row'
 import List, {ListItem} from 'sq-web-components-core-react/collections/List'
 import {IconMenu, IconArrowback} from 'sq-web-icons'
 import Heading from "sq-web-components-core-react/elements/Heading"
+import Home from './Home'
 
 import 'sq-web-icons/icons.css'
 import './styles.css'
 
-import redactor from '../bricks/redactor/brick.js'
+import redactor from "../bricks/redactor/routes.js"
+
+
 
 class App extends Component {
 
@@ -49,8 +52,8 @@ class App extends Component {
         }
     }
 
-    registerBrickView = (path, history) => {
-        this.setState({isBackButtonVisible: ('/' !== path)}) // (brick.routes[0].path
+    registerBrickView = (history, isEntryPoint=false) => {
+        this.setState( {isBackButtonVisible: !isEntryPoint } ) 
         this.setState({history: history})
     }
 
@@ -68,20 +71,19 @@ class App extends Component {
                 <div>
                     <Navbar app fixed position="top" style={navClass}> 
                         <Nav>
-                            <NavbarItem><Heading size="xlarge">admin</Heading></NavbarItem>
+                            <NavbarItem><Heading size="xlarge">my app</Heading></NavbarItem>
                         </Nav>
                         <NavbarSection pullRight>
                             <NavbarItem onClick={this.toggleMenu} style={{fontSize: "2rem", position:"relative", top:"-1rem"}}><IconMenu/></NavbarItem>
                         </NavbarSection>
-                        <Nav className="second-navbar" horizontal style={{display: (this.state.isBackButtonVisible) ? "block" : "none" }}>
-                            <NavbarItem onClick={this.goBack}><IconArrowback /></NavbarItem>
+                        <Nav className="second-navbar" horizontal style={ {display: (this.state.isBackButtonVisible) ? "block" : "none" } }>
+                            <NavbarItem onClick={ this.goBack }><IconArrowback /></NavbarItem>
                         </Nav>
                     </Navbar>
                     <div className="container" style={{marginTop: (this.state.isBackButtonVisible) ? "7.5em" : "4.5em" }}>
                         <div className={menuClass} >
                             <div className="Drawer__container">
                                 <div className="Drawer__header">
-                                <div className="Drawer__title">Menu</div>
                                 <span className="Drawer__close" onClick={this.toggleMenu}>
                                     <svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -91,9 +93,9 @@ class App extends Component {
                                 </div>
                                 <div className="Drawer__content">
                                     <List size="large">
-                                        <ListItem>Home</ListItem>
-                                        <ListItem><b>{redactor.brickMenuName}</b></ListItem>
-                                        <ListItem>About</ListItem>
+                                        { /*<ListItem><Link onClick={this.toggleMenu} to={'/'}><b>Home</b></Link></ListItem>*/ }
+                                        <ListItem><Link onClick={this.toggleMenu} to={"/articles"}>Articles</Link></ListItem>
+
                                     </List>
                                 </div>
                             </div>
@@ -104,15 +106,18 @@ class App extends Component {
                             atActive={{ opacity: 1 }}
                             className="switch-wrapper"
                         >
-                            {redactor.routes.map((route, index) => 
-                                <Route key={index} exact path={(index == 0) ? '/' : route.path} 
-                                    render={ (props) => {
-                                            props.registerBrickView = this.registerBrickView
-                                            return React.createElement(route.component, props)
-                                        }
+
+
+                            <Route exact path='/'  
+                                render={ (props) => {
+                                        props.registerBrickView = this.registerBrickView
+                                        return React.createElement(Home, props)
                                     }
-                                />
-                            )}
+                                }
+                            />
+
+                            {redactor.routes.map((route, index) => <Route key={ index } exact path={ route.path }  render={ (props) => { props.registerBrickView = this.registerBrickView; return React.createElement(route.component, props); } } /> )}
+
                         </AnimatedSwitch>
                     </div>
                 </div> 

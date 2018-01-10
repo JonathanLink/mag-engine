@@ -3,15 +3,15 @@ server {
     listen       80;
     server_name  localhost;
 
-    location /@NGINX_APP_SHORT_NAME@ {
-        alias /dist;
-		try_files $uri /@NGINX_APP_SHORT_NAME@/index.html;
+    location / {
+        root /dist;
+		try_files $uri /index.html;
         gzip_static on;
     }
     
     @NGINX_BRICK_API@
     
-    #location /@NGINX_APP_SHORT_NAME@/api {
+    #location /api {
     #    rewrite ^/api(.*)$ $1 break;
     #    proxy_pass http://server:@SERVER_APP_SERVER_PORT@;
     #    proxy_http_version 1.1;

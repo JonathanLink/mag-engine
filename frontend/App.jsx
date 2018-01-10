@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
-import New from './src/components/New'
 import SetName from './src/components/SetName'
 import SetColor from './src/components/SetColor'
 import SetBricks from './src/components/SetBricks'
-import ListApp from './src/components/List'
+import Dashboard from './src/components/Dashboard'
 
 import './node_modules/sq-web-components-core-theme/sq-web-components-core-theme.min.css'
 import './styles.css'
@@ -108,7 +107,7 @@ class App extends Component {
                     </Navbar>
                     <div className="container">
                         <Switch>
-                            <Route exact path='/' component={New}/>
+                            <Route exact path='/' component={Dashboard}/>
                             <Route exact path='/new/setName'
                                 render={ (props) => {
                                         //this.setId()
@@ -136,14 +135,14 @@ class App extends Component {
                                     }
                                 }
                             />
-                            <Route exact path='/list'
+                            <Route exact path='/dashboard'
                                 render={ (props) => {
                                         props.getAppId = this.getAppId
-                                        return React.createElement(ListApp, props)
+                                        return React.createElement(Dashboard, props)
                                     }
                                 }
                             />
-                            <Route path='/:appId/dashboard' component={New}/>
+                           
                         </Switch>
                     </div>
                 </div> 

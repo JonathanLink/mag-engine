@@ -30,12 +30,6 @@ let config = {
             globDirectory: './dist/',
             globPatterns: ['**/*.{html,js,css,woff,woff2,json,jpg}'],
             swDest: './dist/sw.js',
-            manifestTransforms: [
-                (manifestEntries) => manifestEntries.map((entry) => {
-                    entry.url = '/appdemo' + entry.url;
-                    return entry;
-                })
-              ],
             clientsClaim: true,
             skipWaiting: true,
             runtimeCaching: [

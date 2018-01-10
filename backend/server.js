@@ -88,7 +88,7 @@ async function main() {
                 console.log('startWebApp')
                 try {
                     let appPath = __dirname + '/apps/' + app.appName
-                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose start`)
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose start && docker unpause ${app.appName}_nginx_1`)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
                     return stdout
@@ -120,7 +120,7 @@ async function main() {
                 console.log('stopWebApp')
                 try {
                     let appPath = __dirname + '/apps/' + app.appName
-                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose stop`)
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose stop && docker pause ${app.appName}_nginx_1`)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
                     return stdout
@@ -207,17 +207,51 @@ async function main() {
                 }
             }
             await startBrickService()
-            return h.response().created()
+            return h.response().created(JSON.stringify({port: nginxPortNumber}))
         }
     })
 
     server.route({
         method: 'DELETE',
-        path:'/app/{appId}', 
-        handler: (request, h) => {
-            console.log(request.payload)
+        path:'/{appId}', 
+        handler: async (request, h) => {
+            const appId = request.params.appId
+            
+            let app
+            try {
+                app = await appModel.findOne( { _id: appId } )
+            } catch (e) {
+                console.log(e)
+                return Boom.badImplementation()
+            }  
+            
+            async function dockerDownWebApp(app) {
+                console.log('stopWebApp')
+                try {
+                    let appPath = __dirname + '/apps/' + app.appName
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker rm -f ${app.appName}_nginx_1  && docker-compose down --remove-orphans `)
+                    console.log('stdout:', stdout)
+                    console.log('stderr:', stderr)
+                    return stdout
+                } catch (e) {
+                    console.log(e)
+                    return Boom.badImplementation('internal error: cannot stop webapp')
+                }
+            }
+
+            await dockerDownWebApp(app)
+            
+
+            
             // save app in mongodb
-            return h.response().created()
+            let appPath = __dirname + '/apps/' + app.appName
+            try {
+                await exec(`docker exec magengine_api_1 rm -rf ${appPath}`)
+            } catch(e) {
+                console.log(e)
+            }
+            await appModel.remove( { _id: appId } )
+            return h.response()
         }
     })
 

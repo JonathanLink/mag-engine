@@ -12,14 +12,13 @@ const extractLess = new ExtractTextPlugin({
 let config = {
     entry: {
         shell: ['babel-polyfill', './entry/shell.js']
-        ,redactor: "./bricks/redactor/components/Articles"
 
     },
     output: {
         path: path.resolve(__dirname, './dist'),
         filename: '[name].chunk.js',
         chunkFilename: '[name]-chunk.js',
-        publicPath: "/appdemo"
+        publicPath: '/'
     },
     devtool: 'eval-source-map',
     resolve: {
@@ -68,7 +67,7 @@ let config = {
         extractLess,
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            chunks: ['vendor', 'shell' , "redactor"],
+            chunks: ['vendor', 'shell'],
             template: './entry/index.html'
         }),
         new CompressionPlugin({

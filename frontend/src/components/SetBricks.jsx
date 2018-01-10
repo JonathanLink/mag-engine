@@ -57,6 +57,7 @@ class SetBricks extends Component {
             this.setState( {showErrorNotification: true} )
         } else {
             console.log(">" + response.blob())
+            this.props.history.push('/dashboard')
         }
     }
 

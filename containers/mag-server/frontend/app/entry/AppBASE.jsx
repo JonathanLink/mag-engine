@@ -51,8 +51,8 @@ class App extends Component {
         }
     }
 
-    registerBrickView = (path, history) => {
-        this.setState( {isBackButtonVisible: !('/appdemo/' === path)} ) // (brick.routes[0].path
+    registerBrickView = (history, isEntryPoint=false) => {
+        this.setState( {isBackButtonVisible: !isEntryPoint } ) 
         this.setState({history: history})
     }
 
@@ -83,7 +83,6 @@ class App extends Component {
                         <div className={menuClass} >
                             <div className="Drawer__container">
                                 <div className="Drawer__header">
-                                <div className="Drawer__title">Menu</div>
                                 <span className="Drawer__close" onClick={this.toggleMenu}>
                                     <svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -93,7 +92,7 @@ class App extends Component {
                                 </div>
                                 <div className="Drawer__content">
                                     <List size="large">
-                                        <ListItem><Link onClick={this.toggleMenu} to={'/@HOMEPAGE@'}><b>Home!</b></Link></ListItem>
+                                        { /*<ListItem><Link onClick={this.toggleMenu} to={'/'}><b>Home</b></Link></ListItem>*/ }
                                         //@AUTO-GENERATED-MENU@
                                     </List>
                                 </div>
@@ -107,7 +106,7 @@ class App extends Component {
                         >
 
 
-                            <Route path='/appdemo'  
+                            <Route exact path='/'  
                                 render={ (props) => {
                                         props.registerBrickView = this.registerBrickView
                                         return React.createElement(Home, props)

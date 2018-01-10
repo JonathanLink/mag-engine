@@ -94,11 +94,11 @@ async function init() {
             }
 
             // mv files in admin/src
-            try {
+            /*try {
                 const {stdout, stderr} = await exec(`mv tmp/${brickName}/frontend/admin/src/brick frontend/admin/bricks/${brickName}`)
             } catch(e) {
                 console.log(e)
-            }
+            }*/
 
             // mv brick backend in bricks
             try {
@@ -117,11 +117,11 @@ async function init() {
 
         //}
             // generate imports for app/entry/App.jsx
-            importBrick =  importBrick + `import ${brickName} from "../bricks/${brickName}/brick.js"\\n`
+            importBrick =  importBrick + `import ${brickName} from "../bricks/${brickName}/routes.js"\\n`
 
             let brickInfo
             try {
-                brickInfo = await readFile(`frontend/app/app.conf`  , 'utf8')
+                brickInfo = await readFile(`frontend/app/bricks/${brickName}/brick.conf`  , 'utf8')
                 brickInfo = await JSON.parse(brickInfo)
                 console.log(brickInfo)
             } catch(e) {
@@ -136,7 +136,7 @@ async function init() {
             webpackChunks = webpackChunks + `, "${brickName}"`
 
             // nginx brick api routes
-            nginxBrickAPIRoutes = nginxBrickAPIRoutes + `location /${app.appName.toLowerCase()}/api/brick/${brickName} { \\n\\t\\t rewrite ^/${app.appName.toLowerCase()}(.*)$ $1 break; \\n\\t\\t proxy_pass http://${app.appName.toLowerCase()}_${brickName}_api_1:8000; \\n\\t\\t proxy_http_version 1.1; \\n\\t\\t proxy_set_header Upgrade $http_upgrade; \\n\\t\\t proxy_set_header Connection "upgrade"; \\n\\t\\t proxy_set_header Host $host; \\n\\t\\t proxy_cache_bypass $http_upgrade; \\n\\t}\\n` 
+            nginxBrickAPIRoutes = nginxBrickAPIRoutes + `location /api/brick/${brickName} { \\n\\t\\t proxy_pass http://${app.appName.toLowerCase()}_${brickName}_api_1:8000; \\n\\t\\t proxy_http_version 1.1; \\n\\t\\t proxy_set_header Upgrade $http_upgrade; \\n\\t\\t proxy_set_header Connection "upgrade"; \\n\\t\\t proxy_set_header Host $host; \\n\\t\\t proxy_cache_bypass $http_upgrade; \\n\\t}\\n` 
 
             // dirty fix
             console.log("wait for " + brickName)
@@ -153,15 +153,15 @@ async function init() {
         try {
 
             // generate shell.js
-            await exec(`rm frontend/app/entry/shell.js && cp frontend/app/entry/shell.BASE.js frontend/app/entry/shell.js`)
-            let placeholder = "//@SW_PATH@"
-            let swpath = `./${app.appName.toLowerCase()}/sw.js`
-            await exec(`sed -i 's#${placeholder}#${swpath}#g' frontend/app/entry/shell.js`)
+            //await exec(`rm frontend/app/entry/shell.js && cp frontend/app/entry/shell.BASE.js frontend/app/entry/shell.js`)
+            //let placeholder = "//@SW_PATH@"
+            //let swpath = `./${app.appName.toLowerCase()}/sw.js`
+            //await exec(`sed -i 's#${placeholder}#${swpath}#g' frontend/app/entry/shell.js`)
 
             // generate shell/App.js (app / admin)
             await exec(`rm frontend/app/entry/App.jsx && cp frontend/app/entry/AppBASE.jsx frontend/app/entry/App.jsx`)
             
-            placeholder = "//@AUTO-GENERATED-IMPORT@"
+            let placeholder = "//@AUTO-GENERATED-IMPORT@"
             await exec(`sed -i 's#${placeholder}#${importBrick}#g' frontend/app/entry/App.jsx`)
             
             placeholder = "//@AUTO-GENERATED-MENU@"
@@ -170,25 +170,46 @@ async function init() {
             placeholder = "//@AUTO-GENERATED-ROUTE@"
             await exec(`sed -i 's#${placeholder}#${routeBrick}#g' frontend/app/entry/App.jsx`)
 
-            placeholder = "@HOMEPAGE@"
-            await exec(`sed -i 's#${placeholder}#${app.appName.toLowerCase()}#g' frontend/app/entry/App.jsx`)
+            // Home.js
+            placeholder = "@@ENTRY_BRICK@@"
+            await exec(`rm frontend/app/entry/Home.js && cp frontend/app/entry/Home.BASE.js frontend/app/entry/Home.js`)
+            let brickInfo
+            try {
+                brickInfo = await readFile(`frontend/app/bricks/${ app.bricks[0] }/brick.conf`  , 'utf8')
+                brickInfo = await JSON.parse(brickInfo)
+                console.log(brickInfo)
+            } catch(e) {
+                console.log(e)
+            }
+            await exec(`sed -i 's#${placeholder}#${ brickInfo.entry }#g' frontend/app/entry/Home.js`)
+
+            //placeholder = "@HOMEPAGE@"
+            //await exec(`sed -i 's#${placeholder}#${app.appName.toLowerCase()}#g' frontend/app/entry/App.jsx`)
             
+            // index.html
+            await exec(`rm frontend/app/entry/index.html && cp frontend/app/entry/index.BASE.html frontend/app/entry/index.html`)
+            placeholder = "@@APP_SHORT_NAME@@"
+            await exec(`sed -i 's#${placeholder}#${app.appName}#g' frontend/app/entry/index.html`)
+            placeholder = "@@APP_NAME@@"
+            await exec(`sed -i 's#${placeholder}#${app.name}#g' frontend/app/entry/index.html`)
+            placeholder = "@@APP_PRIMARY_COLOR@@"
+            await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/app/entry/index.html`)
             
             // generate webpack (app / admin)
             await exec(`rm frontend/app/webpack.common.js && cp frontend/app/webpack.common.BASE.js frontend/app/webpack.common.js`)
             placeholder = "//@ENTRIES@"
             await exec(`sed -i 's#${placeholder}#${webpackEntries}#g' frontend/app/webpack.common.js`)
-            placeholder = "//@PUBLIC_PATH@"
-            const publicPath = `"/${app.appName.toLowerCase()}"`
-            await exec(`sed -i 's#${placeholder}#${publicPath}#g' frontend/app/webpack.common.js`)
+            //placeholder = "//@PUBLIC_PATH@"
+            //const publicPath = `"/${app.appName.toLowerCase()}"`
+            //await exec(`sed -i 's#${placeholder}#${publicPath}#g' frontend/app/webpack.common.js`)
             placeholder = "//@CHUNKS@"
             await exec(`sed -i 's#${placeholder}#${webpackChunks}#g' frontend/app/webpack.common.js`)
 
-            await exec(`rm frontend/app/webpack.prod.js && cp frontend/app/webpack.prod.BASE.js frontend/app/webpack.prod.js`)
+            /*await exec(`rm frontend/app/webpack.prod.js && cp frontend/app/webpack.prod.BASE.js frontend/app/webpack.prod.js`)
             placeholder = "//@SW_PREFIX_URL@"
             let swPrefixURL= '/' + app.appName
             swPrefixURL = swPrefixURL.toLowerCase()
-            await exec(`sed -i 's#${placeholder}#${swPrefixURL}#g' frontend/app/webpack.prod.js`)
+            await exec(`sed -i 's#${placeholder}#${swPrefixURL}#g' frontend/app/webpack.prod.js`)*/
 
             // webpack 
             await exec(`cd frontend/app && webpack --config webpack.prod.js`)        
@@ -196,10 +217,12 @@ async function init() {
             // update nginx route
             await exec(`rm nginx/conf.d/default.conf && cp nginx/conf.d/default.base nginx/conf.d/default.conf`)
 
+            /*
             placeholder = "@NGINX_APP_SHORT_NAME@"
-            let nginAppName= app.appName
-            nginAppName = nginAppName.toLowerCase()
-            await exec(`sed -i 's#${placeholder}#${nginAppName}#g' nginx/conf.d/default.conf`)
+            let nginxAppName= app.appName
+            nginxAppName = nginxAppName.toLowerCase()
+            await exec(`sed -i 's#${placeholder}#${nginxAppName}#g' nginx/conf.d/default.conf`)
+            */
 
             placeholder = "@SERVER_APP_SERVER_PORT@"
             await exec(`sed -i 's#${placeholder}#${process.env.SERVER_PORT_NUMBER}#g' nginx/conf.d/default.conf`)      
@@ -220,7 +243,7 @@ async function init() {
                 console.log("DOCKER COMPOSE UP " + brickName)
                 //await exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`)
                 await exec(`cd bricks/${brickName} && docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml -p ${app.appName} up --build -d`)
-                await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -p :80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
+                await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -p :80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
             } catch(e) {
                 console.log(e)
             }

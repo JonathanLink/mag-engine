@@ -18,7 +18,7 @@ let config = {
         path: path.resolve(__dirname, './dist'),
         filename: '[name].chunk.js',
         chunkFilename: '[name]-chunk.js',
-        publicPath: '/'
+        publicPath: '/admin/'
     },
     devtool: 'eval-source-map',
     resolve: {

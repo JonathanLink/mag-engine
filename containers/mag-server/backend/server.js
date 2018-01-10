@@ -62,16 +62,19 @@ async function init() {
         "redactor": "/home/node/bricks-repo/prod/redactor"
     }
 
-    let importBrick = ''
-    let menuBrick = ""
-    let routeBrick = ''
+   
+
+    async function setup(dir)  {
+
+        let importBrick = ''
+        let menuBrick = ""
+        let routeBrick = ''
+        
+        let webpackEntries = ''
+        let webpackChunks = ''
     
-    let webpackEntries = ''
-    let webpackChunks = ''
+        let nginxBrickAPIRoutes = ''
 
-    let nginxBrickAPIRoutes = ''
-
-    async function step1()  {
         for (let brickName of app.bricks) {
             // brick git clone (npm issue + proxy + .git folder permission issue later when mv)
             /*try {
@@ -80,48 +83,45 @@ async function init() {
                 console.log(e)
             }*/
             //if (false) { 
-            try {
-                const {stdout, stderr} = await exec(`cd tmp && cp -r ${brickRepos[brickName]} ${brickName}`)
-            } catch(e) {
-                console.log(e)
+            if (dir === 'app') {
+                try {
+                    const {stdout, stderr} = await exec(`cd tmp && cp -r ${brickRepos[brickName]} ${brickName}`)
+                } catch(e) {
+                    console.log(e)
+                }
             }
             
             // mv files in app/src
             try {
-                const {stdout, stderr} = await exec(`mv tmp/${brickName}/frontend/app/src/brick frontend/app/bricks/${brickName}`)
+                const {stdout, stderr} = await exec(`mv tmp/${brickName}/frontend/${dir}/src/brick frontend/${dir}/bricks/${brickName}`)
             } catch(e) {
                 console.log(e)
             }
 
-            // mv files in admin/src
-            /*try {
-                const {stdout, stderr} = await exec(`mv tmp/${brickName}/frontend/admin/src/brick frontend/admin/bricks/${brickName}`)
-            } catch(e) {
-                console.log(e)
-            }*/
+            if (dir === 'app') {
+                // mv brick backend in bricks
+                try {
+                    const {stdout, stderr} = await exec(`mv tmp/${brickName}/backend bricks/${brickName}`)
+                } catch(e) {
+                    console.log(e)
+                }
 
-            // mv brick backend in bricks
-            try {
-                const {stdout, stderr} = await exec(`mv tmp/${brickName}/backend bricks/${brickName}`)
-            } catch(e) {
-                console.log(e)
+                // generate docker-compose for backend
+            
+                let placeholder = "@APP_NAME@"
+                await exec(`sed -i 's#${placeholder}#${app.appName}#g' bricks/${brickName}/docker-compose.prod.yml`) 
+                placeholder = "@BASE_PATH@"
+                await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' bricks/${brickName}/docker-compose.prod.yml`)
+                placeholder = "@APP_NAME_ENV@"
+                await exec(`sed -i 's#${placeholder}#${app.appName.toLowerCase()}#g' bricks/${brickName}/docker-compose.prod.yml`)
             }
-
-            // generate docker-compose for backend
-            let placeholder = "@APP_NAME@"
-            await exec(`sed -i 's#${placeholder}#${app.appName}#g' bricks/${brickName}/docker-compose.prod.yml`) 
-            placeholder = "@BASE_PATH@"
-            await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' bricks/${brickName}/docker-compose.prod.yml`)
-            placeholder = "@APP_NAME_ENV@"
-            await exec(`sed -i 's#${placeholder}#${app.appName.toLowerCase()}#g' bricks/${brickName}/docker-compose.prod.yml`)
-
         //}
             // generate imports for app/entry/App.jsx
             importBrick =  importBrick + `import ${brickName} from "../bricks/${brickName}/routes.js"\\n`
 
             let brickInfo
             try {
-                brickInfo = await readFile(`frontend/app/bricks/${brickName}/brick.conf`  , 'utf8')
+                brickInfo = await readFile(`frontend/${dir}/bricks/${brickName}/brick.conf`  , 'utf8')
                 brickInfo = await JSON.parse(brickInfo)
                 console.log(brickInfo)
             } catch(e) {
@@ -139,90 +139,67 @@ async function init() {
             nginxBrickAPIRoutes = nginxBrickAPIRoutes + `location /api/brick/${brickName} { \\n\\t\\t proxy_pass http://${app.appName.toLowerCase()}_${brickName}_api_1:8000; \\n\\t\\t proxy_http_version 1.1; \\n\\t\\t proxy_set_header Upgrade $http_upgrade; \\n\\t\\t proxy_set_header Connection "upgrade"; \\n\\t\\t proxy_set_header Host $host; \\n\\t\\t proxy_cache_bypass $http_upgrade; \\n\\t}\\n` 
 
             // dirty fix
-            console.log("wait for " + brickName)
+            /*console.log("wait for " + brickName)
             await wait(8000);
-            console.log("ok")
+            console.log("ok")*/
 
         }
-    }
-
-    
 
 
-    async function step2() {
+
+        // step 2
         try {
-
-            // generate shell.js
-            //await exec(`rm frontend/app/entry/shell.js && cp frontend/app/entry/shell.BASE.js frontend/app/entry/shell.js`)
-            //let placeholder = "//@SW_PATH@"
-            //let swpath = `./${app.appName.toLowerCase()}/sw.js`
-            //await exec(`sed -i 's#${placeholder}#${swpath}#g' frontend/app/entry/shell.js`)
+            
 
             // generate shell/App.js (app / admin)
-            await exec(`rm frontend/app/entry/App.jsx && cp frontend/app/entry/AppBASE.jsx frontend/app/entry/App.jsx`)
+            await exec(`rm frontend/${dir}/entry/App.jsx && cp frontend/${dir}/entry/AppBASE.jsx frontend/${dir}/entry/App.jsx`)
             
             let placeholder = "//@AUTO-GENERATED-IMPORT@"
-            await exec(`sed -i 's#${placeholder}#${importBrick}#g' frontend/app/entry/App.jsx`)
+            await exec(`sed -i 's#${placeholder}#${importBrick}#g' frontend/${dir}/entry/App.jsx`)
             
             placeholder = "//@AUTO-GENERATED-MENU@"
-            await exec(`sed -i 's#${placeholder}#${menuBrick}#g' frontend/app/entry/App.jsx`)
+            await exec(`sed -i 's#${placeholder}#${menuBrick}#g' frontend/${dir}/entry/App.jsx`)
 
             placeholder = "//@AUTO-GENERATED-ROUTE@"
-            await exec(`sed -i 's#${placeholder}#${routeBrick}#g' frontend/app/entry/App.jsx`)
+            await exec(`sed -i 's#${placeholder}#${routeBrick}#g' frontend/${dir}/entry/App.jsx`)
+
+            placeholder = "@@APP_NAME@@"
+            await exec(`sed -i 's#${placeholder}#${app.name}#g' frontend/${dir}/entry/App.jsx`)
 
             // Home.js
             placeholder = "@@ENTRY_BRICK@@"
-            await exec(`rm frontend/app/entry/Home.js && cp frontend/app/entry/Home.BASE.js frontend/app/entry/Home.js`)
+            await exec(`rm frontend/${dir}/entry/Home.js && cp frontend/${dir}/entry/Home.BASE.js frontend/${dir}/entry/Home.js`)
             let brickInfo
             try {
-                brickInfo = await readFile(`frontend/app/bricks/${ app.bricks[0] }/brick.conf`  , 'utf8')
+                brickInfo = await readFile(`frontend/${dir}/bricks/${ app.bricks[0] }/brick.conf`  , 'utf8')
                 brickInfo = await JSON.parse(brickInfo)
                 console.log(brickInfo)
             } catch(e) {
                 console.log(e)
             }
-            await exec(`sed -i 's#${placeholder}#${ brickInfo.entry }#g' frontend/app/entry/Home.js`)
+            await exec(`sed -i 's#${placeholder}#${ brickInfo.entry }#g' frontend/${dir}/entry/Home.js`)
 
-            //placeholder = "@HOMEPAGE@"
-            //await exec(`sed -i 's#${placeholder}#${app.appName.toLowerCase()}#g' frontend/app/entry/App.jsx`)
-            
             // index.html
-            await exec(`rm frontend/app/entry/index.html && cp frontend/app/entry/index.BASE.html frontend/app/entry/index.html`)
+            await exec(`rm frontend/${dir}/entry/index.html && cp frontend/${dir}/entry/index.BASE.html frontend/${dir}/entry/index.html`)
             placeholder = "@@APP_SHORT_NAME@@"
-            await exec(`sed -i 's#${placeholder}#${app.appName}#g' frontend/app/entry/index.html`)
+            await exec(`sed -i 's#${placeholder}#${app.appName}#g' frontend/${dir}/entry/index.html`)
             placeholder = "@@APP_NAME@@"
-            await exec(`sed -i 's#${placeholder}#${app.name}#g' frontend/app/entry/index.html`)
+            await exec(`sed -i 's#${placeholder}#${app.name}#g' frontend/${dir}/entry/index.html`)
             placeholder = "@@APP_PRIMARY_COLOR@@"
-            await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/app/entry/index.html`)
+            await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/entry/index.html`)
             
             // generate webpack (app / admin)
-            await exec(`rm frontend/app/webpack.common.js && cp frontend/app/webpack.common.BASE.js frontend/app/webpack.common.js`)
+            await exec(`rm frontend/${dir}/webpack.common.js && cp frontend/${dir}/webpack.common.BASE.js frontend/${dir}/webpack.common.js`)
             placeholder = "//@ENTRIES@"
-            await exec(`sed -i 's#${placeholder}#${webpackEntries}#g' frontend/app/webpack.common.js`)
-            //placeholder = "//@PUBLIC_PATH@"
-            //const publicPath = `"/${app.appName.toLowerCase()}"`
-            //await exec(`sed -i 's#${placeholder}#${publicPath}#g' frontend/app/webpack.common.js`)
+            await exec(`sed -i 's#${placeholder}#${webpackEntries}#g' frontend/${dir}/webpack.common.js`)
             placeholder = "//@CHUNKS@"
-            await exec(`sed -i 's#${placeholder}#${webpackChunks}#g' frontend/app/webpack.common.js`)
-
-            /*await exec(`rm frontend/app/webpack.prod.js && cp frontend/app/webpack.prod.BASE.js frontend/app/webpack.prod.js`)
-            placeholder = "//@SW_PREFIX_URL@"
-            let swPrefixURL= '/' + app.appName
-            swPrefixURL = swPrefixURL.toLowerCase()
-            await exec(`sed -i 's#${placeholder}#${swPrefixURL}#g' frontend/app/webpack.prod.js`)*/
+            await exec(`sed -i 's#${placeholder}#${webpackChunks}#g' frontend/${dir}/webpack.common.js`)
 
             // webpack 
-            await exec(`cd frontend/app && webpack --config webpack.prod.js`)        
+            await exec(`cd frontend/${dir} && webpack --config webpack.prod.js`)        
         
             // update nginx route
             await exec(`rm nginx/conf.d/default.conf && cp nginx/conf.d/default.base nginx/conf.d/default.conf`)
-
-            /*
-            placeholder = "@NGINX_APP_SHORT_NAME@"
-            let nginxAppName= app.appName
-            nginxAppName = nginxAppName.toLowerCase()
-            await exec(`sed -i 's#${placeholder}#${nginxAppName}#g' nginx/conf.d/default.conf`)
-            */
 
             placeholder = "@SERVER_APP_SERVER_PORT@"
             await exec(`sed -i 's#${placeholder}#${process.env.SERVER_PORT_NUMBER}#g' nginx/conf.d/default.conf`)      
@@ -236,6 +213,12 @@ async function init() {
         }
     }
 
+    
+
+
+        
+    
+
    
     async function step3() {
         for (let brickName of app.bricks) {
@@ -243,15 +226,17 @@ async function init() {
                 console.log("DOCKER COMPOSE UP " + brickName)
                 //await exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`)
                 await exec(`cd bricks/${brickName} && docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml -p ${app.appName} up --build -d`)
-                await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -p :80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
+                // dirty fix: otherwise nginx was launch/ready too early 
+                await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/app/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/admin/dist:/admin/dist -p :80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
             } catch(e) {
                 console.log(e)
             }
         }
     }
 
-    await step1()
-    await step2()
+    
+    await setup('app')
+    await setup('admin')
     await step3()
 
 

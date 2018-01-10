@@ -35,7 +35,8 @@ services:
     volumes:
       - @MAG_ENGINE_BASE_PATH@mag/mag-engine/apps/@APP_NAME@/nginx/conf.d:/etc/nginx/conf.d   #absolute path!
       - @MAG_ENGINE_BASE_PATH@mag/mag-engine/apps/@APP_NAME@/nginx/nginx.conf:/etc/nginx/nginx.conf   #absolute path!
-      - @MAG_ENGINE_BASE_PATH@mag/mag-engine/apps/@APP_NAME@/frontend/app/dist:/dist          #absolute path!
+      - @MAG_ENGINE_BASE_PATH@mag/mag-engine/apps/@APP_NAME@/frontend/app/dist:/app/dist          #absolute path!
+      - @MAG_ENGINE_BASE_PATH@mag/mag-engine/apps/@APP_NAME@/frontend/admin/dist:/admin/dist          #absolute path!
     depends_on:
       - server
     ports:

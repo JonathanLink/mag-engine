@@ -6,7 +6,7 @@ import ButtonGroup from "sq-web-components-core-react/forms/ButtonGroup"
 import Input from "sq-web-components-core-react/forms/Input"
 import Heading from "sq-web-components-core-react/elements/Heading"
 
-class Start extends Component {
+class LandingPage extends Component {
 
     constructor(props) {
         super(props)
@@ -24,16 +24,13 @@ class Start extends Component {
                     
                 </RowItem>
 	            <RowItem xs={12} style={{textAlign: "right", right: "25%"}}>
-                    <ButtonGroup>
-                        <Link to={ '/' }><Button>Cancel</Button></Link>
-                        <Link to={ '/new/setColor' }><Button level="success">Launch the App</Button></Link>
-                    </ButtonGroup>
+                    <Link to={ '/dashboard' }><Button level="success">Start</Button></Link>
                 </RowItem>
             </Row>
         )       
   }
 }
 
-export default Start
+export default LandingPage
 
 

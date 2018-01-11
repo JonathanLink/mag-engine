@@ -86,6 +86,7 @@ class Dashboard extends Component {
                             let app = await this.setStateForApp(index, "running")
                             this.setApp(app, index)
                             this.toggleButtonForApp(index)
+                            this.getAppList()
                         }, TIME_INSTALLING * 1000, index)
                     await fetch("/api/install/" + app._id, { method: "PUT" })
                     break
@@ -183,7 +184,7 @@ class Dashboard extends Component {
                     <RowItem xs={8}>
                         { app.name }
                         <br/>
-                        <small>{ this.state.list[index].stateMessage }</small>
+                        <small>{ this.state.list[index].stateMessage } { (this.state.list[index].port < 0) ? '' : '' + this.state.list[index].port} </small>
                     </RowItem>
                     <RowItem xs={1} style={ {textAlign: "left"} }>
                         { deleteButton }

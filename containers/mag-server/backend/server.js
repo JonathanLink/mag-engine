@@ -45,11 +45,6 @@ async function init() {
         console.log(e)
     }
 
-    // for each 
-        // brick git clone
-        // mv files in app/src
-        // mv file in admin/src
-        // docker-compose up
     try {    
         app = await JSON.parse(app)
     } catch(e) {
@@ -152,7 +147,7 @@ async function init() {
             
 
             // generate shell/App.js (app / admin)
-            await exec(`rm frontend/${dir}/entry/App.jsx && cp frontend/${dir}/entry/AppBASE.jsx frontend/${dir}/entry/App.jsx`)
+            await exec(`rm -f frontend/${dir}/entry/App.jsx && cp frontend/${dir}/entry/AppBASE.jsx frontend/${dir}/entry/App.jsx`)
             
             let placeholder = "//@AUTO-GENERATED-IMPORT@"
             await exec(`sed -i 's#${placeholder}#${importBrick}#g' frontend/${dir}/entry/App.jsx`)
@@ -168,7 +163,7 @@ async function init() {
 
             // Home.js
             placeholder = "@@ENTRY_BRICK@@"
-            await exec(`rm frontend/${dir}/entry/Home.js && cp frontend/${dir}/entry/Home.BASE.js frontend/${dir}/entry/Home.js`)
+            await exec(`rm -f frontend/${dir}/entry/Home.js && cp frontend/${dir}/entry/Home.BASE.js frontend/${dir}/entry/Home.js`)
             let brickInfo
             try {
                 brickInfo = await readFile(`frontend/${dir}/bricks/${ app.bricks[0] }/brick.conf`  , 'utf8')
@@ -180,7 +175,7 @@ async function init() {
             await exec(`sed -i 's#${placeholder}#${ brickInfo.entry }#g' frontend/${dir}/entry/Home.js`)
 
             // index.html
-            await exec(`rm frontend/${dir}/entry/index.html && cp frontend/${dir}/entry/index.BASE.html frontend/${dir}/entry/index.html`)
+            await exec(`rm -f frontend/${dir}/entry/index.html && cp frontend/${dir}/entry/index.BASE.html frontend/${dir}/entry/index.html`)
             placeholder = "@@APP_SHORT_NAME@@"
             await exec(`sed -i 's#${placeholder}#${app.appName}#g' frontend/${dir}/entry/index.html`)
             placeholder = "@@APP_NAME@@"
@@ -188,8 +183,14 @@ async function init() {
             placeholder = "@@APP_PRIMARY_COLOR@@"
             await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/entry/index.html`)
             
+             // style.css
+             await exec(`rm -f frontend/${dir}/entry/styles.css && cp frontend/${dir}/entry/styles.base.css frontend/${dir}/entry/styles.css`)
+             placeholder = "@@PRIMARY_COLOR@@"
+             await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/entry/styles.css`)
+            
+             
             // generate webpack (app / admin)
-            await exec(`rm frontend/${dir}/webpack.common.js && cp frontend/${dir}/webpack.common.BASE.js frontend/${dir}/webpack.common.js`)
+            await exec(`rm -f frontend/${dir}/webpack.common.js && cp frontend/${dir}/webpack.common.BASE.js frontend/${dir}/webpack.common.js`)
             placeholder = "//@ENTRIES@"
             await exec(`sed -i 's#${placeholder}#${webpackEntries}#g' frontend/${dir}/webpack.common.js`)
             placeholder = "//@CHUNKS@"
@@ -199,7 +200,7 @@ async function init() {
             await exec(`cd frontend/${dir} && webpack --config webpack.prod.js`)        
         
             // update nginx route
-            await exec(`rm nginx/conf.d/default.conf && cp nginx/conf.d/default.base nginx/conf.d/default.conf`)
+            await exec(`rm -f nginx/conf.d/default.conf && cp nginx/conf.d/default.base nginx/conf.d/default.conf`)
 
             placeholder = "@SERVER_APP_SERVER_PORT@"
             await exec(`sed -i 's#${placeholder}#${process.env.SERVER_PORT_NUMBER}#g' nginx/conf.d/default.conf`)      
@@ -227,7 +228,7 @@ async function init() {
                 //await exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`)
                 await exec(`cd bricks/${brickName} && docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml -p ${app.appName} up --build -d`)
                 // dirty fix: otherwise nginx was launch/ready too early 
-                await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/app/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/admin/dist:/admin/dist -p :80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
+                await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/app/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/admin/dist:/admin/dist -p ${app.port}:80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
             } catch(e) {
                 console.log(e)
             }

@@ -4,6 +4,7 @@ import SetName from './src/components/SetName'
 import SetColor from './src/components/SetColor'
 import SetBricks from './src/components/SetBricks'
 import Dashboard from './src/components/Dashboard'
+import LandingPage from './src/components/LandingPage'
 
 import './node_modules/sq-web-components-core-theme/sq-web-components-core-theme.min.css'
 import './styles.css'
@@ -39,15 +40,6 @@ class App extends Component {
         )
     }
 
-    /*setId = () => {
-        this.state.newApp.id = this.uuidv4()
-        console.log(this.state.newApp)
-    }
-
-    getAppId = () => {
-        return this.state.newApp.id
-    }*/
-
     setName = (name) => {
         this.state.newApp.name = name
         const formatNameToAppName = (n) => {
@@ -58,6 +50,8 @@ class App extends Component {
         } 
         if (name.length > 1) {
             this.state.newApp.appName = formatNameToAppName(name)
+        } else {
+            this.state.newApp.appName = ""
         }
         console.log(this.state.newApp)
     }
@@ -107,7 +101,7 @@ class App extends Component {
                     </Navbar>
                     <div className="container">
                         <Switch>
-                            <Route exact path='/' component={Dashboard}/>
+                            <Route exact path='/' component={LandingPage}/>
                             <Route exact path='/new/setName'
                                 render={ (props) => {
                                         //this.setId()

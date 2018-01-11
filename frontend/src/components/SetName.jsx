@@ -19,7 +19,7 @@ class SetName extends Component {
 
 
     toggleNextButton = () => {
-        if (this.props.getName() && this.props.getName().length > 0) {
+        if (this.props.getName() && this.props.getName().length > 1) {
             this.setState({showNextButton: true})
         } else {
             this.setState({showNextButton: false})    

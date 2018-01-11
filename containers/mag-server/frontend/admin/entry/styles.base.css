@@ -29,3 +29,14 @@
 .switch-wrapper > div {
     position: absolute;
 }
+
+.List__item > a {
+    font-size: 2rem;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* custom color */
+.Navbar, .Drawer__container {
+    background-color: @@PRIMARY_COLOR@@;
+}

@@ -51,9 +51,8 @@ class App extends Component {
         }
     }
 
-    registerBrickView = (history, isEntry) => {
-        console.log('fdsa')
-        this.setState( {isBackButtonVisible: !isEntry} )
+    registerBrickView = (history, isEntryPoint=false) => {
+        this.setState( {isBackButtonVisible: !isEntryPoint } ) 
         this.setState({history: history})
     }
 
@@ -99,13 +98,13 @@ class App extends Component {
                                 </div>
                             </div>
                         </div>
-                        <AnimatedSwitch  
+                        {/*<AnimatedSwitch  
                             atEnter={{ opacity: 0 }}
                             atLeave={{ opacity: 0 }}
                             atActive={{ opacity: 1 }}
                             className="switch-wrapper"
-                        >
-
+                        >*/}
+                        <Switch>
 
                             <Route exact path='/'  
                                 render={ (props) => {
@@ -117,7 +116,8 @@ class App extends Component {
 
                             //@AUTO-GENERATED-ROUTE@
 
-                        </AnimatedSwitch>
+                        {/*</AnimatedSwitch>*/}
+                        </Switch>
                     </div>
                 </div> 
             </Router>

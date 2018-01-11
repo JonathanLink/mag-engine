@@ -168,6 +168,15 @@ async function main() {
             const serverPortNumber = Math.floor(Math.random() * (MAX_PORT_NUMBER - MIN_PORT_NUMBER) ) + MIN_PORT_NUMBER  
             const nginxPortNumber = Math.floor(Math.random() * (MAX_PORT_NUMBER - MIN_PORT_NUMBER) ) + MIN_PORT_NUMBER  
 
+            try {
+                await appModel.update({_id: appId}, {$set: {port: nginxPortNumber}})
+                console.log("PORT NGINX: "+nginxPortNumber)
+                app.port = nginxPortNumber
+            } catch (e) {
+                console.log(e)
+                throw Boom.unsupportedMediaType(e)
+            }
+            
             // 3. Export app config in a json file and save it in the folder
             try {
                 await fs.writeFileSync(appPath + '/backend/app.json', JSON.stringify(app) , 'utf-8'); 
@@ -207,7 +216,10 @@ async function main() {
                 }
             }
             await startBrickService()
-            return h.response().created(JSON.stringify({port: nginxPortNumber}))
+
+           
+
+            return h.response().created()
         }
     })
 

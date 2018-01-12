@@ -100,6 +100,7 @@ class Dashboard extends Component {
                     }, TIME_STOPPING * 1000, index)
                     await fetch("/api/stop/" + app._id, { method: "PUT" })
                 break
+                case 'error':
                 case 'stopped':
                 case 'starting':
                     this.setStateForApp(index, "starting")
@@ -184,7 +185,7 @@ class Dashboard extends Component {
                     <RowItem xs={8}>
                         { app.name }
                         <br/>
-                        <small>{ this.state.list[index].stateMessage } { (this.state.list[index].port < 0) ? '' : '' + this.state.list[index].port} </small>
+                        <small>{ this.state.list[index].stateMessage } { (this.state.list[index].port < 0 || this.state.list[index].state !== 'running') ? '' : <span> <a href={"http://localhost:"+this.state.list[index].port} target="_blank">go to the app</a> | <a href={"http://localhost:"+this.state.list[index].port+"/admin/"} target="_blank">go to the admin</a> </span>}  </small>
                     </RowItem>
                     <RowItem xs={1} style={ {textAlign: "left"} }>
                         { deleteButton }

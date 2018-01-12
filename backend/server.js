@@ -88,7 +88,7 @@ async function main() {
                 console.log('startWebApp')
                 try {
                     let appPath = __dirname + '/apps/' + app.appName
-                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose start && docker unpause ${app.appName}_nginx_1`)
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose start && docker start ${app.appName.toLowerCase()}_nginx_1`)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
                     return stdout
@@ -120,7 +120,7 @@ async function main() {
                 console.log('stopWebApp')
                 try {
                     let appPath = __dirname + '/apps/' + app.appName
-                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose stop && docker pause ${app.appName}_nginx_1`)
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose stop && docker stop ${app.appName.toLowerCase()}_nginx_1`)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
                     return stdout

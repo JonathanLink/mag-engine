@@ -49,7 +49,7 @@ class SetName extends Component {
                     <Link to={ '/new/setColor' }><Button block style={ {display: displayNextButton} } level="info">Next</Button></Link>
                 </RowItem>
 	            <RowItem xs={12} >
-                    <Link to={ '/' }><Button block >Cancel</Button></Link>
+                    <Link to={ '/dashboard' }><Button block >Cancel</Button></Link>
                 </RowItem>
                
             </Row>

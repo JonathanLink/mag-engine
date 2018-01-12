@@ -92,7 +92,7 @@ class SetBricks extends Component {
                     <Link to={ '/new/setColor' }><Button block>Previous</Button></Link>
                 </RowItem>
                 <RowItem xs={ 12 } >
-                    <Link to={ '/' }><Button block >Cancel</Button></Link>
+                    <Link to={ '/dashboard' }><Button block >Cancel</Button></Link>
                 </RowItem>
             
 

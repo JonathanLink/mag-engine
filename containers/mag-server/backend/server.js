@@ -133,19 +133,11 @@ async function init() {
             // nginx brick api routes
             nginxBrickAPIRoutes = nginxBrickAPIRoutes + `location /api/brick/${brickName} { \\n\\t\\t proxy_pass http://${app.appName.toLowerCase()}_${brickName}_api_1:8000; \\n\\t\\t proxy_http_version 1.1; \\n\\t\\t proxy_set_header Upgrade $http_upgrade; \\n\\t\\t proxy_set_header Connection "upgrade"; \\n\\t\\t proxy_set_header Host $host; \\n\\t\\t proxy_cache_bypass $http_upgrade; \\n\\t}\\n` 
 
-            // dirty fix
-            /*console.log("wait for " + brickName)
-            await wait(8000);
-            console.log("ok")*/
-
         }
-
-
 
         // step 2
         try {
-            
-
+        
             // generate shell/App.js (app / admin)
             await exec(`rm -f frontend/${dir}/entry/App.jsx && cp frontend/${dir}/entry/AppBASE.jsx frontend/${dir}/entry/App.jsx`)
             
@@ -188,7 +180,6 @@ async function init() {
              placeholder = "@@PRIMARY_COLOR@@"
              await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/entry/styles.css`)
             
-             
             // generate webpack (app / admin)
             await exec(`rm -f frontend/${dir}/webpack.common.js && cp frontend/${dir}/webpack.common.BASE.js frontend/${dir}/webpack.common.js`)
             placeholder = "//@ENTRIES@"
@@ -198,7 +189,23 @@ async function init() {
 
             // webpack 
             await exec(`cd frontend/${dir} && webpack --config webpack.prod.js`)        
-        
+            
+
+            if (dir === 'app') {
+                // add manifest.json to dist folder
+                await exec(`rm -f frontend/${dir}/dist/manifest.json && cp frontend/${dir}/entry/manifest.base.json frontend/${dir}/dist/manifest.json`)
+                let placeholder = "@@APP_SHORT_NAME@@"
+                await exec(`sed -i 's!${placeholder}!${app.appName}!g' frontend/${dir}/dist/manifest.json`)
+                placeholder = "@@APP_NAME@@"
+                await exec(`sed -i 's!${placeholder}!${app.name}!g' frontend/${dir}/dist/manifest.json`)
+                placeholder = "@@APP_COLOR@@"
+                await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/dist/manifest.json`)
+
+                // add favicon to dist folder 
+                await exec(`rm -f frontend/${dir}/dist/favicon.ico && cp frontend/${dir}/entry/favicon.ico frontend/${dir}/dist/favicon.ico`)
+
+            }
+
             // update nginx route
             await exec(`rm -f nginx/conf.d/default.conf && cp nginx/conf.d/default.base nginx/conf.d/default.conf`)
 

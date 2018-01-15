@@ -32,6 +32,7 @@ let config = {
             swDest: './dist/sw.js',
             clientsClaim: true,
             skipWaiting: true,
+            navigateFallback: ['/index.html'],
             runtimeCaching: [
                 {
                     urlPattern: new RegExp('.*/api/brick'),

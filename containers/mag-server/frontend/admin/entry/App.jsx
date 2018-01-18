@@ -71,7 +71,8 @@ class App extends Component {
                 <div>
                     <Navbar app fixed position="top" style={navClass}> 
                         <Nav>
-                            <NavbarItem><Heading size="xlarge">@@APP_NAME@@ - admin</Heading></NavbarItem>
+                            <span style={ {position: "absolute", top: "0.2rem"} }>admin</span>
+                            <NavbarItem><Heading size="xlarge">@@APP_NAME@@</Heading></NavbarItem>
                         </Nav>
                         <NavbarSection pullRight>
                             <NavbarItem onClick={this.toggleMenu} style={{fontSize: "2rem", position:"relative", top:"-1rem"}}><IconMenu/></NavbarItem>

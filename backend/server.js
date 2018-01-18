@@ -88,6 +88,8 @@ async function main() {
                 console.log('startWebApp')
                 try {
                     let appPath = __dirname + '/apps/' + app.appName
+                    // nginx is start after because when it was it the docker-compose it was started before webapp static files were generated
+                    // fix: put back nginx inside docker-compose and then add a timer to execute docker exec ----nginx_1 nginx -s reload 
                     const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose start && docker start ${app.appName.toLowerCase()}_nginx_1`)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
@@ -241,7 +243,7 @@ async function main() {
                 console.log('stopWebApp')
                 try {
                     let appPath = __dirname + '/apps/' + app.appName
-                    const { stdout, stderr } = await exec(`cd ${appPath} && docker rm -f ${app.appName}_nginx_1  && docker-compose down --remove-orphans `)
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker rmi -f ${app.appName.toLowerCase()}_nginx_1  && docker-compose down --rmi 'all' --remove-orphans `)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
                     return stdout

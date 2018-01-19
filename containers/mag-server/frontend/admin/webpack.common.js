@@ -1,5 +1,7 @@
 const Webpack = require('webpack')
+const merge = require('webpack-merge')
 const path = require('path')
+const fix = require('./webpack.fix.js')
 const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionPlugin = require('compression-webpack-plugin')
@@ -80,4 +82,4 @@ let config = {
     ]
 }
 
-module.exports = config
+module.exports = merge(fix, config)

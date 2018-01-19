@@ -30,7 +30,7 @@
     position: absolute;
 }
 
-.List__item > a {
+.Drawer__content .List__item > a {
     font-size: 2rem;
     text-decoration: none;
     font-weight: bold;

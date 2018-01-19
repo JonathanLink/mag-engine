@@ -36,7 +36,7 @@ let config = {
             runtimeCaching: [
                 {
                     urlPattern: new RegExp('.*/api/brick'),
-                    handler: 'staleWhileRevalidate'
+                    handler: 'networkFirst'
                 }
             ]
         })

@@ -20,6 +20,9 @@ let config = {
         chunkFilename: '[name]-chunk.js'
     },
     devtool: 'eval-source-map',
+    watchOptions: {
+        poll: true
+    },
     resolve: {
         extensions: ['.js', '.jsx', '.json']
     },

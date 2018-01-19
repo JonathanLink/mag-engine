@@ -1,9 +1,12 @@
 const Webpack = require('webpack')
 const path = require('path')
+const merge = require('webpack-merge')
 const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionPlugin = require('compression-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
+@@IMPORT_WEBPACK_BRICK@@
 
 const extractLess = new ExtractTextPlugin({
     filename: '[name].css'
@@ -80,4 +83,4 @@ let config = {
     ]
 }
 
-module.exports = config
+module.exports = merge(@@BRICK_MERGE_WEBPACK@@ config)

@@ -65,6 +65,8 @@ async function init() {
         let menuBrick = ""
         let routeBrick = ''
         
+        let webpackImportBrickConfig = ''
+        let webpackMergeBrickConfig = ''
         let webpackEntries = ''
         let webpackChunks = ''
     
@@ -126,6 +128,10 @@ async function init() {
             menuBrick = menuBrick + `<ListItem><Link onClick={this.toggleMenu} to={"${brickInfo.entry}"}>${brickInfo.menuName}</Link></ListItem>\\n`
             routeBrick = routeBrick + `{${brickName}.routes.map((route, index) => <Route key={ index } exact path={ route.path }  render={ (props) => { props.registerBrickView = this.registerBrickView; return React.createElement(route.component, props); } } /> )}`
 
+            // webpack import brick config file
+            webpackImportBrickConfig = webpackImportBrickConfig + `const ${brickName} = require("./bricks/${brickName}/webpack.brick.js")\\n`
+            webpackMergeBrickConfig = webpackMergeBrickConfig + `${brickName},`
+            
             // generate webpack (app / admin)
             webpackEntries = webpackEntries + `,redactor: "./bricks/${brickName}/components/${brickInfo.entryComponent}"\\n`
             webpackChunks = webpackChunks + `, "${brickName}"`
@@ -186,6 +192,11 @@ async function init() {
             await exec(`sed -i 's#${placeholder}#${webpackEntries}#g' frontend/${dir}/webpack.common.js`)
             placeholder = "//@CHUNKS@"
             await exec(`sed -i 's#${placeholder}#${webpackChunks}#g' frontend/${dir}/webpack.common.js`)
+
+            placeholder = "@@IMPORT_WEBPACK_BRICK@@"
+            await exec(`sed -i 's#${placeholder}#${webpackImportBrickConfig}#g' frontend/${dir}/webpack.common.js`)
+            placeholder = "@@BRICK_MERGE_WEBPACK@@"
+            await exec(`sed -i 's#${placeholder}#${webpackMergeBrickConfig}#g' frontend/${dir}/webpack.common.js`)
 
             // webpack 
             await exec(`cd frontend/${dir} && webpack --config webpack.prod.js`)        

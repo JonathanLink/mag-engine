@@ -181,7 +181,7 @@ class Dashboard extends Component {
         const listApp = this.state.list.map( (app, index) => {
             let deleteButton = (app.state === 'uninstalled' || app.state === 'stopped' || app.state === 'deleting' || app.state === 'error' ) ? <span style={ {fontSize: "1.2rem"} }  onClick={ () => this.deleteApp(event, index) } ><IconDelete/></span>: <span/> 
             return (
-                <Row key={ index } >
+                <Row key={ index }  >
                     <RowItem xs={8}>
                         { app.name }
                         <br/>
@@ -201,15 +201,15 @@ class Dashboard extends Component {
         return (
             <div>
                  <Row>
-                    <RowItem xs={12} style={ {textAlign: "right"} }>
-                        <Link to={ '/new/setName' }>
+                    <RowItem xs={12} >
+                        <Link to={ '/new/setName' } style={ {position: "absolute", right: "6rem", top: "1rem" } }>
                             <Button level="success">Create A New App</Button>
                         </Link>
                     </RowItem>
                 </Row>
 
                 <Row>
-                    <RowItem xs={12} style={ {textAlign: "left"} }>
+                    <RowItem xs={12} style={ {textAlign: "left", marginTop: "5rem"} }>
                         <Heading size="xlarge">Apps</Heading>
                     </RowItem>
                 </Row>

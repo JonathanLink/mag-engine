@@ -186,6 +186,16 @@ async function init() {
              placeholder = "@@PRIMARY_COLOR@@"
              await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/entry/styles.css`)
             
+
+            // custom.css for each brick
+            if (dir === 'app') {
+                for (let brickName of app.bricks) {
+                    await exec(`rm -f frontend/${dir}/bricks/${brickName}/assets/custom.css && cp frontend/${dir}/bricks/${brickName}/assets/custom.base.css frontend/${dir}/bricks/${brickName}/assets/custom.css`)
+                    let placeholder = "@@PRIMARY_COLOR@@"
+                    await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/bricks/${brickName}/assets/custom.css`)
+                }
+            }
+
             // generate webpack (app / admin)
             await exec(`rm -f frontend/${dir}/webpack.common.js && cp frontend/${dir}/webpack.common.BASE.js frontend/${dir}/webpack.common.js`)
             placeholder = "//@ENTRIES@"

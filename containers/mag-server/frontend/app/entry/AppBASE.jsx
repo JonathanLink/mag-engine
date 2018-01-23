@@ -70,7 +70,7 @@ class App extends Component {
                 <div>
                     <Navbar app fixed position="top" style={navClass}> 
                         <Nav>
-                            <NavbarItem><Heading size="xlarge">@@APP_NAME@@</Heading></NavbarItem>
+                            <NavbarItem><Heading size="xlarge"style={{fontWeight: "100"}}>@@APP_NAME@@</Heading></NavbarItem>
                         </Nav>
                         <NavbarSection pullRight>
                             <NavbarItem onClick={this.toggleMenu} style={{fontSize: "2rem", position:"relative", top:"-1rem"}}><IconMenu/></NavbarItem>
@@ -118,6 +118,12 @@ class App extends Component {
 
                         </AnimatedSwitch>
                     </div>
+
+                    <div style={{clear: "both", background: "lightgray", textAlign: "center"}}>
+                        <span style={ {fontSize: "0.7rem"} }>the present app has been created with ease and joy thanks to MAG - check it out, it's free and vegan friendly!</span>
+                    </div>
+
+
                 </div> 
             </Router>
         )

@@ -1,5 +1,4 @@
 .container {
-    margin-top: 4.5em;
     padding: 0.1em;
     padding-bottom: 5em;
     padding-left: 1rem;
@@ -29,7 +28,7 @@
 }
   
 .switch-wrapper > div {
-    position: absolute;
+    position: relative;
 }
 
 .List__item > a {
@@ -39,6 +38,14 @@
 }
 
 /* custom color */
-.Navbar, .Drawer__container {
+.Drawer__container {
     background-color: @@PRIMARY_COLOR@@;
+}
+
+.Navbar--app {
+    border-bottom: 0.1rem solid @@PRIMARY_COLOR@@; 
+}
+
+.heading-app-name {
+    font-weight: 100;
 }

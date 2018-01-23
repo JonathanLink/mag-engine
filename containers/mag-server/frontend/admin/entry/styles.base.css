@@ -39,6 +39,14 @@
 }
 
 /* custom color */
-.Navbar, .Drawer__container {
+.Drawer__container {
     background-color: @@PRIMARY_COLOR@@;
+}
+
+.Navbar--app {
+    border-bottom: 0.1rem solid @@PRIMARY_COLOR@@; 
+}
+
+.heading-app-name {
+    font-weight: 100;
 }

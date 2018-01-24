@@ -70,7 +70,7 @@ class App extends Component {
                 <div>
                     <Navbar app fixed position="top" style={navClass}> 
                         <Nav>
-                            <NavbarItem><Heading size="xlarge">@@APP_NAME@@ - admin</Heading></NavbarItem>
+                            <NavbarItem><Heading size="xlarge" className="heading-app-name" >@@APP_NAME@@ - admin</Heading></NavbarItem>
                         </Nav>
                         <NavbarSection pullRight>
                             <NavbarItem onClick={this.toggleMenu} style={{fontSize: "2rem", position:"relative", top:"-1rem"}}><IconMenu/></NavbarItem>
@@ -79,7 +79,7 @@ class App extends Component {
                             <NavbarItem onClick={ this.goBack }><IconArrowback /></NavbarItem>
                         </Nav>
                     </Navbar>
-                    <div className="container" style={{marginTop: (this.state.isBackButtonVisible) ? "7.5em" : "4.5em" }}>
+                    <div className="container" style={{marginTop: (this.state.isBackButtonVisible) ? "7.5em" : "10.5em" }}>
                         <div className={menuClass} >
                             <div className="Drawer__container">
                                 <div className="Drawer__header">

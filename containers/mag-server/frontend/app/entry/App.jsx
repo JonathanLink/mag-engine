@@ -120,8 +120,8 @@ class App extends Component {
                     </div>
 
 
-                    <div style={{clear: "both", background: "lightgray", textAlign: "center"}}>
-                        <span style={ {fontSize: "0.7rem"} }>the present app has been created with ease and joy thanks to MAG - check it out, it's free and vegan friendly!</span>
+                    <div style={{background: "lightgray", textAlign: "center", bottom: "0", position: "absolute", width: "100%"}}>
+                        <span style={ {fontSize: "0.7rem"} }>the present app has been created with ease and joy thanks to MAG - check it out at www...</span>
                     </div>
 
                 </div> 

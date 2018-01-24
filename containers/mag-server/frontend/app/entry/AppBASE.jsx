@@ -79,7 +79,7 @@ class App extends Component {
                             <NavbarItem onClick={ this.goBack }><IconArrowback /></NavbarItem>
                         </Nav>
                     </Navbar>
-                    <div className="container" style={{marginTop: (this.state.isBackButtonVisible) ? "7.5em" : "4.5em" }}>
+                    <div className="container" style={{marginTop: (this.state.isBackButtonVisible) ? "7.5em" : "10.5em" }}>
                         <div className={menuClass} >
                             <div className="Drawer__container">
                                 <div className="Drawer__header">
@@ -119,8 +119,8 @@ class App extends Component {
                         </AnimatedSwitch>
                     </div>
 
-                    <div style={{clear: "both", background: "lightgray", textAlign: "center"}}>
-                        <span style={ {fontSize: "0.7rem"} }>the present app has been created with ease and joy thanks to MAG - check it out, it's free and vegan friendly!</span>
+                    <div style={{background: "lightgray", textAlign: "center"}}>
+                        <span style={ {fontSize: "0.7rem"} }>the present app has been created with ease and joy thanks to MAG - check it out at www...</span>
                     </div>
 
 

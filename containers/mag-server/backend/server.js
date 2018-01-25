@@ -71,8 +71,9 @@ async function init() {
         let webpackChunks = ''
     
         let nginxBrickAPIRoutes = ''
-
+    
         for (let brickName of app.bricks) {
+           
             // brick git clone (npm issue + proxy + .git folder permission issue later when mv)
             /*try {
                 const {stdout, stderr} = await exec(`cd tmp && git clone ${brickRepos[brickName]}`)
@@ -126,7 +127,7 @@ async function init() {
             }
         
             menuBrick = menuBrick + `<ListItem><Link onClick={this.toggleMenu} to={"${brickInfo.entry}"}>${brickInfo.menuName}</Link></ListItem>\\n`
-            routeBrick = routeBrick + `{${brickName}.routes.map((route, index) => <Route key={ index } exact path={ route.path }  render={ (props) => { props.registerBrickView = this.registerBrickView; return React.createElement(route.component, props); } } /> )}`
+            routeBrick = routeBrick + `{${brickName}.routes.map((route, index) => <Route key={ index } exact path={ route.path }  render={ (props) => { props.setBackButton = this.setBackButton; return React.createElement(route.component, props); } } /> )}`
 
             // webpack import brick config file
             webpackImportBrickConfig = webpackImportBrickConfig + `const ${brickName} = require("./bricks/${brickName}/webpack.brick.js")\\n`
@@ -155,6 +156,15 @@ async function init() {
 
             placeholder = "//@AUTO-GENERATED-ROUTE@"
             await exec(`sed -i 's#${placeholder}#${routeBrick}#g' frontend/${dir}/entry/App.jsx`)
+
+            placeholder = "@PRIMARY_COLOR@"
+            await exec(`sed -i 's/${placeholder}/${app.color}/g' frontend/${dir}/entry/App.jsx`)
+
+
+            if (dir === 'app') {
+                placeholder = "@DEFAULT_BRICK@"
+                await exec(`sed -i 's#${placeholder}#${app.bricks[0]}#g' frontend/${dir}/entry/App.jsx`)
+            }
 
             placeholder = "@@APP_NAME@@"
             await exec(`sed -i 's#${placeholder}#${app.name}#g' frontend/${dir}/entry/App.jsx`)
@@ -240,6 +250,8 @@ async function init() {
         } catch(e) {
             console.log(e)
         }
+
+        
     }
 
     

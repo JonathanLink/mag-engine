@@ -1,6 +1,5 @@
 .container {
     padding: 0.1em;
-    padding-bottom: 5em;
     padding-left: 1rem;
     padding-right: 1rem;
     max-width: 900px;
@@ -23,15 +22,17 @@
     }
 }
 
+
 .switch-wrapper {
-    position: relative;
+    position: absolute;
 }
   
 .switch-wrapper > div {
-    position: relative;
+    position: absolute;
+    width: 100%;
 }
 
-.List__item > a {
+.Drawer .List__item > a {
     font-size: 2rem;
     text-decoration: none;
     font-weight: bold;

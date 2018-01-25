@@ -51,13 +51,18 @@ class App extends Component {
         }
     }
 
-    registerBrickView = (history, isEntryPoint=false) => {
-        this.setState( {isBackButtonVisible: !isEntryPoint } ) 
-        this.setState({history: history})
+    setBackButton = (path, history=null) => {
+        if (! path ) {
+            this.setState( {isBackButtonVisible: false } ) 
+            return
+        }
+        this.setState( {isBackButtonVisible: true } ) 
+        this.setState( {history: history } ) 
+        this.setState( {backPath: path } ) 
     }
 
     goBack = () => {
-        this.state.history.goBack()
+        this.state.history.push(this.state.backPath)
     }
 
     render() {
@@ -79,7 +84,7 @@ class App extends Component {
                             <NavbarItem onClick={ this.goBack }><IconArrowback /></NavbarItem>
                         </Nav>
                     </Navbar>
-                    <div className="container" style={{marginTop: (this.state.isBackButtonVisible) ? "7.5em" : "10.5em" }}>
+                    <div className="container" style={{marginTop: (this.state.isBackButtonVisible) ? "9rem" : "10rem" }}>
                         <div className={menuClass} >
                             <div className="Drawer__container">
                                 <div className="Drawer__header">
@@ -98,34 +103,24 @@ class App extends Component {
                                 </div>
                             </div>
                         </div>
-                        <AnimatedSwitch  
-                            atEnter={{ opacity: 0 }}
-                            atLeave={{ opacity: 0 }}
-                            atActive={{ opacity: 1 }}
-                            className="switch-wrapper"
-                        >
+                    
+                        <Switch>
 
-
-                            <Route exact path='/'  
-                                render={ (props) => {
-                                        props.registerBrickView = this.registerBrickView
-                                        return React.createElement(Home, props)
-                                    }
-                                }
-                            />
-
+                            <Route exact path="/" render={ (props) => { props.setBackButton = this.setBackButton; return React.createElement(@DEFAULT_BRICK@.routes[0].component, props); } }  />
                             //@AUTO-GENERATED-ROUTE@
 
-                        </AnimatedSwitch>
+                        </Switch>
+                        
                     </div>
 
-                    <div style={{background: "lightgray", textAlign: "center"}}>
-                        <span style={ {fontSize: "0.7rem"} }>the present app has been created with ease and joy thanks to MAG - check it out at www...</span>
+                    
+                    <div style={{background: "@PRIMARY_COLOR@", textAlign: "center", position: "absolute", bottom: "0", width: "100%"}}>
+                        <span style={ {fontSize: "0.7rem"} }>this app has been created without any technical skills thanks to mag</span>
                     </div>
-
 
                 </div> 
-            </Router>
+
+            </Router>      
         )
   }
 }

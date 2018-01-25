@@ -44,7 +44,7 @@ class SetColor extends Component {
                 <RowItem xs={12} style={{textAlign: "center", marginTop: "2rem"}}>
                     <Heading size="xsmall" style={{color: "gray"}}>carefully pick the main color of your app</Heading>
                     <div style={ {display: "inline-flex", marginTop: "2rem"} } >
-                        <CirclePicker width={ 250 } circleSize={ 32 } onChangeComplete={ this.setColor } colors={["#fd7f60", "#f74f88", "#dd5ef3", "#b388ff", "#717bb7", "#5871ff", "#00b0ff", "#00e2ff", "#00d8c4", "#79ff7e", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#FF6633", "#b38e81", "#cecece"]} color={ this.props.getColor() } />
+                        <CirclePicker width={ 250 } circleSize={ 32 } onChangeComplete={ this.setColor } colors={["#fd7f60", "#f74f88", "#dd5ef3", "#b388ff", "#717bb7", "#5871ff", "#00b0ff", "#00e2ff", "#00d8c4", "#79ff7e", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#FF6633", "#b38e81", "#d3d3d3"]} color={ this.props.getColor() } />
                     </div>
                 </RowItem>
               

@@ -84,7 +84,7 @@ class App extends Component {
                             <NavbarItem onClick={ this.goBack }><IconArrowback /></NavbarItem>
                         </Nav>
                     </Navbar>
-                    <div className="container" style={{marginTop: (this.state.isBackButtonVisible) ? "9rem" : "10rem" }}>
+                    <div className="container" style={{marginTop: (this.state.isBackButtonVisible) ? "8rem" : "6rem", marginBottom: "5rem" }}>
                         <div className={menuClass} >
                             <div className="Drawer__container">
                                 <div className="Drawer__header">

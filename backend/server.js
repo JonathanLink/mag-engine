@@ -243,7 +243,7 @@ async function main() {
                 console.log('stopWebApp')
                 try {
                     let appPath = __dirname + '/apps/' + app.appName
-                    const { stdout, stderr } = await exec(`cd ${appPath} && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker rmi -f ${app.appName.toLowerCase()}_nginx_1  && docker-compose down --rmi 'all' --remove-orphans `)
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker rmi -f ${app.appName.toLowerCase()}_nginx  && docker-compose down --rmi all --remove-orphans `)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
                     return stdout

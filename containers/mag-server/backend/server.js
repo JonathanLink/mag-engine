@@ -137,7 +137,7 @@ async function init() {
             webpackMergeBrickConfig = webpackMergeBrickConfig + `${brickName},`
             
             // generate webpack (app / admin)
-            webpackEntries = webpackEntries + `,redactor: "./bricks/${brickName}/components/${brickInfo.entryComponent}"\\n`
+            webpackEntries = webpackEntries + `,${brickName}: "./bricks/${brickName}/components/${brickInfo.entryComponent}"\\n`
             webpackChunks = webpackChunks + `, "${brickName}"`
 
             // nginx brick api routes
@@ -146,7 +146,7 @@ async function init() {
         }
 
         // step 2
-        try {
+        //try {
         
             // generate shell/App.js (app / admin)
             await exec(`rm -f frontend/${dir}/entry/App.jsx && cp frontend/${dir}/entry/AppBASE.jsx frontend/${dir}/entry/App.jsx`)
@@ -222,21 +222,30 @@ async function init() {
             await exec(`sed -i 's#${placeholder}#${webpackMergeBrickConfig}#g' frontend/${dir}/webpack.common.js`)
 
             // webpack 
-            await exec(`cd frontend/${dir} && webpack --config webpack.prod.js`)        
-            
+            try {
+                await exec(`cd frontend/${dir} && webpack --config webpack.prod.js`)        
+            } catch(e) {
+                
+            }
 
             //if (dir === 'app') {
                 // add manifest.json to dist folder
-                await exec(`rm -f frontend/${dir}/dist/manifest.json && cp frontend/${dir}/entry/manifest.base.json frontend/${dir}/dist/manifest.json`)
-                placeholder = "@@APP_SHORT_NAME@@"
-                await exec(`sed -i 's!${placeholder}!${app.appName}!g' frontend/${dir}/dist/manifest.json`)
-                placeholder = "@@APP_NAME@@"
-                await exec(`sed -i 's!${placeholder}!${app.name}!g' frontend/${dir}/dist/manifest.json`)
-                placeholder = "@@APP_COLOR@@"
-                await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/dist/manifest.json`)
+                try {
+                    console.log("*******dfdfdfddddfdfdfd****************" + dir)
+                    await exec(`rm -f frontend/${dir}/dist/manifest.json && cp frontend/${dir}/entry/manifest.base.json frontend/${dir}/dist/manifest.json`)
+                    placeholder = "@@APP_SHORT_NAME@@"
+                    await exec(`sed -i 's!${placeholder}!${app.appName}!g' frontend/${dir}/dist/manifest.json`)
+                    placeholder = "@@APP_NAME@@"
+                    await exec(`sed -i 's!${placeholder}!${app.name}!g' frontend/${dir}/dist/manifest.json`)
+                    placeholder = "@@APP_COLOR@@"
+                    await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/dist/manifest.json`)
 
-                // add favicon to dist folder 
-                await exec(`rm -f frontend/${dir}/dist/favicon.ico && cp frontend/${dir}/entry/favicon.ico frontend/${dir}/dist/favicon.ico`)
+                    // add favicon to dist folder 
+                    await exec(`rm -f frontend/${dir}/dist/favicon.ico && cp frontend/${dir}/entry/favicon.ico frontend/${dir}/dist/favicon.ico`)
+                } catch(e) {
+                    console.log(e)
+                    console.log("*******434432****************")
+                }
 
            //}
 
@@ -250,9 +259,9 @@ async function init() {
             placeholder = "@NGINX_BRICK_API@"
             await exec(`sed -i 's#${placeholder}#${nginxBrickAPIRoutes}#g' nginx/conf.d/default.conf`)
 
-        } catch(e) {
+        /*} catch(e) {
             console.log(e)
-        }
+        }*/
 
         
     }
@@ -270,12 +279,12 @@ async function init() {
                 console.log("DOCKER COMPOSE UP " + brickName)
                 //await exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`)
                 await exec(`cd bricks/${brickName} && docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml -p ${app.appName} up --build -d`)
-                // dirty fix: otherwise nginx was launch/ready too early 
-                await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/app/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/admin/dist:/admin/dist -p ${app.port}:80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
             } catch(e) {
                 console.log(e)
             }
         }
+        // dirty fix: otherwise nginx was launch/ready too early 
+        await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/app/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/admin/dist:/admin/dist -p ${app.port}:80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
     }
 
     

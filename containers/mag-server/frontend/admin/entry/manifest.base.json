@@ -1,6 +1,6 @@
 {
-    "short_name": "@@APP_SHORT_NAME@@",
-    "name": "@@APP_NAME@@",
+    "short_name": "admin @@APP_SHORT_NAME@@",
+    "name": "admin @@APP_NAME@@",
     "background_color": "@@APP_COLOR@@",
     "theme_color": "@@APP_COLOR@@",
     "icons": [

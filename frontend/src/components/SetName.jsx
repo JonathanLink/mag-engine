@@ -38,18 +38,19 @@ class SetName extends Component {
 
         return (
             <Row>
-                <RowItem xs={12} style={{textAlign: "center"}}>
+                <RowItem xs={12} style={{textAlign: "center", marginBottom: "10rem"}}>
                     <Heading size="xlarge">Name your app</Heading>
-                    <Heading size="xsmall">step 1 out of 3</Heading>
+                    <Heading size="xsmall" style={{fontWeight: 100}}>step 1 out of 3</Heading>
                 </RowItem>
-                <RowItem xs={12}>
-                    <Input onChange={ this.setName } value={ this.props.getName() } name="app-name" placeholder="the shorter the better"  />
+                <RowItem xs={12} style={{marginBottom: "10rem"}}>
+                    <Input style={ { textAlign: "center"}} onChange={ this.setName } value={ this.props.getName() } name="app-name" placeholder="the shorter the better"  />
                 </RowItem>
-                <RowItem xs={12} >
-                    <Link to={ '/new/setColor' }><Button block style={ {display: displayNextButton} } level="info">Next</Button></Link>
-                </RowItem>
-	            <RowItem xs={12} >
+
+                <RowItem xs={ 6 } >
                     <Link to={ '/dashboard' }><Button block >Cancel</Button></Link>
+                </RowItem>
+                <RowItem xs={ 6 } >
+                    <Link to={ '/new/setColor' }><Button block style={ {display: displayNextButton} }  level="info">Next</Button></Link>
                 </RowItem>
                
             </Row>

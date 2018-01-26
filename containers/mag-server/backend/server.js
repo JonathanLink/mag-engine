@@ -54,7 +54,8 @@ async function init() {
     console.log(app)
 
     const brickRepos = {
-        "redactor": "/home/node/bricks-repo/prod/redactor"
+        "redactor": "/home/node/bricks-repo/prod/redactor",
+        "survey": "/home/node/bricks-repo/prod/survey"
     }
 
    
@@ -108,6 +109,8 @@ async function init() {
             
                 let placeholder = "@APP_NAME@"
                 await exec(`sed -i 's#${placeholder}#${app.appName}#g' bricks/${brickName}/docker-compose.prod.yml`) 
+                placeholder = "@BRICK_NAME@"
+                await exec(`sed -i 's#${placeholder}#${brickName}#g' bricks/${brickName}/docker-compose.prod.yml`) 
                 placeholder = "@BASE_PATH@"
                 await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' bricks/${brickName}/docker-compose.prod.yml`)
                 placeholder = "@APP_NAME_ENV@"
@@ -222,10 +225,10 @@ async function init() {
             await exec(`cd frontend/${dir} && webpack --config webpack.prod.js`)        
             
 
-            if (dir === 'app') {
+            //if (dir === 'app') {
                 // add manifest.json to dist folder
                 await exec(`rm -f frontend/${dir}/dist/manifest.json && cp frontend/${dir}/entry/manifest.base.json frontend/${dir}/dist/manifest.json`)
-                let placeholder = "@@APP_SHORT_NAME@@"
+                placeholder = "@@APP_SHORT_NAME@@"
                 await exec(`sed -i 's!${placeholder}!${app.appName}!g' frontend/${dir}/dist/manifest.json`)
                 placeholder = "@@APP_NAME@@"
                 await exec(`sed -i 's!${placeholder}!${app.name}!g' frontend/${dir}/dist/manifest.json`)
@@ -235,7 +238,7 @@ async function init() {
                 // add favicon to dist folder 
                 await exec(`rm -f frontend/${dir}/dist/favicon.ico && cp frontend/${dir}/entry/favicon.ico frontend/${dir}/dist/favicon.ico`)
 
-            }
+           //}
 
             // update nginx route
             await exec(`rm -f nginx/conf.d/default.conf && cp nginx/conf.d/default.base nginx/conf.d/default.conf`)

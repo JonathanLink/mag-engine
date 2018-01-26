@@ -37,26 +37,26 @@ class SetColor extends Component {
         
         return (
             <Row>
-                <RowItem xs={12} style={{textAlign: "center"}}>
+                <RowItem xs={12} style={{textAlign: "center",  marginBottom: "7rem"}}>
                     <Heading size="xlarge">Time For Painting!</Heading>
-                    <Heading size="xsmall">step 2 out of 3</Heading>
+                    <Heading size="xsmall" style={{fontWeight: 100}}>step 2 out of 3</Heading>
                 </RowItem>
-                <RowItem xs={12} style={{textAlign: "center", marginTop: "2rem"}}>
-                    <Heading size="xsmall" style={{color: "gray"}}>carefully pick the main color of your app</Heading>
+                <RowItem xs={12} style={{textAlign: "center", marginBottom: "10rem"}}>
+                    <Heading size="xsmall" style={{color: "gray", fontWeight:100}}>carefully pick the main color of your app</Heading>
                     <div style={ {display: "inline-flex", marginTop: "2rem"} } >
                         <CirclePicker width={ 250 } circleSize={ 32 } onChangeComplete={ this.setColor } colors={["#fd7f60", "#f74f88", "#dd5ef3", "#b388ff", "#717bb7", "#5871ff", "#00b0ff", "#00e2ff", "#00d8c4", "#79ff7e", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#FF6633", "#b38e81", "#d3d3d3"]} color={ this.props.getColor() } />
                     </div>
                 </RowItem>
               
-                
-                <RowItem xs={12} >
-                    <Link to={ '/new/setBricks' }><Button block style={ {display: displayNextButton} } level="info">Next</Button></Link>
-                </RowItem>
-                <RowItem xs={12} >
+            
+                <RowItem xs={ 4 } >
                     <Link to={ '/new/setName' }><Button block>Previous</Button></Link>
                 </RowItem>
-                <RowItem xs={12} >
+                <RowItem xs={ 4 } >
                     <Link to={ '/dashboard' }><Button block >Cancel</Button></Link>
+                </RowItem>
+                <RowItem xs={ 4 } >
+                    <Link to={ '/new/setBricks' }><Button block style={ {display: displayNextButton} } level="info">Next</Button></Link>
                 </RowItem>
             
             </Row>

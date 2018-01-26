@@ -70,12 +70,16 @@ class App extends Component {
     }
 
     addBrick = (brick) => {
-        this.state.newApp.bricks.push(brick)
+        if ( this.state.newApp.bricks.indexOf(brick) < 0) {
+            this.state.newApp.bricks.push(brick)
+        }
         console.log(this.state.newApp)
     }
 
     removeBrick = (brick) => {
-        this.state.newApp.bricks.splice(this.state.newApp.bricks.indexOf(brick), 1)
+        if ( this.state.newApp.bricks.indexOf(brick) >= 0) {
+            this.state.newApp.bricks.splice(this.state.newApp.bricks.indexOf(brick), 1)
+        }
         console.log(this.state.newApp)
     }
 

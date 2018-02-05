@@ -29,6 +29,7 @@ services:
     image: nginx
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd
       - ./frontend/dist:/dist
     depends_on:
       - api

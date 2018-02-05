@@ -2,9 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 
-<noscript>
- Hum, we have a problem. Your device should accept javascript.
-</noscript>
 
 ReactDOM.render(
     <App />,

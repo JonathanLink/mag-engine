@@ -3,6 +3,12 @@ server {
     listen       80;
     server_name  localhost;
 
+    location /admin/sw.js {
+        alias /admin/dist/sw.js;
+        gzip_static on;
+        auth_basic off;
+    }
+
     location /admin {
         #rewrite ^/admin(/.*)$ $1 last; 
         alias /admin/dist;

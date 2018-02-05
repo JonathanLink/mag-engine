@@ -284,13 +284,17 @@ async function init() {
             }
         }
         // dirty fix: otherwise nginx was launch/ready too early 
-        await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/app/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/admin/dist:/admin/dist -p ${app.port}:80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
+        //await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/app/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/admin/dist:/admin/dist -p ${app.port}:80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
+        
     }
 
     
     await setup('app')
     await setup('admin')
     await step3()
+    setTimeout( () => {
+        exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`)
+    }, 3000)
 
 
 

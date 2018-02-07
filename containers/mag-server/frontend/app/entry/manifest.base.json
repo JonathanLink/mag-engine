@@ -20,7 +20,7 @@
         "type": "image/png"
       }
     ],
-    "start_url": "/",
+    "start_url": "/@@APP_NAME@@/",
     "display": "fullscreen",
     "orientation": "portrait"
   }

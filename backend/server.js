@@ -40,7 +40,7 @@ async function main() {
                 await appModel.create(app)
 
                 // update nginx 
-                let apps = await appModel.find({})
+                let apps = await appModel.find({state: "running"})
                 var routes = ''
                 for (let app of apps) {
                     let appName = app.appName
@@ -75,8 +75,9 @@ async function main() {
         method: 'GET',
         path:'/list/app', 
         handler: async (request, h) => {
+            console.log('fdsfsf')
             let list = await appModel.find({})
-            console.log(JSON.stringify(list.reverse()))
+            console.log(JSON.stringify(list))
             return JSON.stringify(list)
         }
     })

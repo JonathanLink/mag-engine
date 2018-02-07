@@ -9,7 +9,7 @@ import "./List.css"
 import {IconDelete} from "sq-web-icons";
 
 
-const TIME_INSTALLING = 45
+const TIME_INSTALLING = 70
 const TIME_STOPPING = 10
 const TIME_STARTING = 10
 const TIME_DELETING = 5
@@ -185,7 +185,7 @@ class Dashboard extends Component {
                     <RowItem xs={8}>
                         { app.name }
                         <br/>
-                        <small>{ this.state.list[index].stateMessage } { (this.state.list[index].port < 0 || this.state.list[index].state !== 'running') ? '' : <span> <a href={"http://localhost:"+this.state.list[index].port} target="_blank">go to the app</a> | <a href={"http://localhost:"+this.state.list[index].port+"/admin/"} target="_blank">go to the admin</a> </span>}  </small>
+                        <small>{ this.state.list[index].stateMessage } { (this.state.list[index].port < 0 || this.state.list[index].state !== 'running') ? '' : <span> : <a href={"http://"+ this.state.list[index].host + "/"+this.state.list[index].appName+'/'} target="_blank">app</a> | <a href={"http://"+ this.state.list[index].host + "/admin/" + this.state.list[index].appName+"/"} target="_blank">admin</a> </span>}  </small>
                     </RowItem>
                     <RowItem xs={1} style={ {textAlign: "left"} }>
                         { deleteButton }
@@ -203,7 +203,7 @@ class Dashboard extends Component {
                  <Row>
                     <RowItem xs={12} >
                         <Link to={ '/new/setName' } style={ {position: "absolute", right: "6rem", top: "1rem" } }>
-                            <Button level="success">Create A New App</Button>
+                            <Button level="success">New App</Button>
                         </Link>
                     </RowItem>
                 </Row>

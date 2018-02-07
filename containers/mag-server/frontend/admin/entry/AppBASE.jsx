@@ -113,7 +113,7 @@ class App extends Component {
                         
                             <Switch>
 
-                                <Route exact path='/'  
+                                <Route exact path='/@@BASE_PATH@@/'  
                                     render={ (props) => {
                                             props.registerBrickView = this.registerBrickView
                                             return React.createElement(Home, props)

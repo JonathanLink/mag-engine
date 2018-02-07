@@ -22,6 +22,8 @@ services:
       - SERVER_PORT_NUMBER=@SERVER_PORT_NUMBER@
       - NGINX_PORT_NUMBER=@NGINX_PORT_NUMBER@
       - BASE_PATH=@MAG_ENGINE_BASE_PATH@
+    networks:
+      - magengine_default
 
   mongo:
     image: mongo:3.0-wheezy
@@ -29,6 +31,8 @@ services:
       - 27017
     volumes:
        - @MAG_ENGINE_BASE_PATH@mag/mag-engine/apps/@APP_NAME@/backend/database:/data/db       #absolute path!
+    networks:
+      - magengine_default
 
   nginx:
     image: nginx
@@ -42,4 +46,9 @@ services:
       - server
     ports:
       - @MAG_SERVER_NGINX_PORT@:80
+    networks:
+      - magengine_default
     
+networks:
+  magengine_default:
+    external: true

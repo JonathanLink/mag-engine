@@ -6,6 +6,7 @@ mongoose.Promise = global.Promise
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const readFile = util.promisify(require('fs').readFile)
+const writeFile = util.promisify(require('fs').writeFile)
 
 const server = Hapi.Server({ 
     host: '0.0.0.0', 
@@ -122,8 +123,12 @@ async function init() {
 
             let brickInfo
             try {
-                brickInfo = await readFile(`frontend/${dir}/bricks/${brickName}/brick.conf`  , 'utf8')
+                brickInfo = await readFile(`frontend/${dir}/bricks/${brickName}/brick.json`  , 'utf8')
                 brickInfo = await JSON.parse(brickInfo)
+                console.log(brickInfo)
+                brickInfo.basePath =  app.host + '/' + app.appName
+                console.log(brickInfo)
+                await writeFile(`frontend/${dir}/bricks/${brickName}/brick.json`, JSON.stringify(brickInfo)  , 'utf8')
                 console.log(brickInfo)
             } catch(e) {
                 console.log(e)
@@ -162,6 +167,9 @@ async function init() {
 
             placeholder = "@PRIMARY_COLOR@"
             await exec(`sed -i 's/${placeholder}/${app.color}/g' frontend/${dir}/entry/App.jsx`)
+            
+            placeholder = "@@BASE_PATH@@"
+            await exec(`sed -i 's/${placeholder}/${app.appName}/g' frontend/${dir}/entry/App.jsx`)
 
 
             if (dir === 'app') {
@@ -177,7 +185,7 @@ async function init() {
             await exec(`rm -f frontend/${dir}/entry/Home.js && cp frontend/${dir}/entry/Home.BASE.js frontend/${dir}/entry/Home.js`)
             let brickInfo
             try {
-                brickInfo = await readFile(`frontend/${dir}/bricks/${ app.bricks[0] }/brick.conf`  , 'utf8')
+                brickInfo = await readFile(`frontend/${dir}/bricks/${ app.bricks[0] }/brick.json`  , 'utf8')
                 brickInfo = await JSON.parse(brickInfo)
                 console.log(brickInfo)
             } catch(e) {
@@ -220,6 +228,8 @@ async function init() {
             await exec(`sed -i 's#${placeholder}#${webpackImportBrickConfig}#g' frontend/${dir}/webpack.common.js`)
             placeholder = "@@BRICK_MERGE_WEBPACK@@"
             await exec(`sed -i 's#${placeholder}#${webpackMergeBrickConfig}#g' frontend/${dir}/webpack.common.js`)
+            placeholder = "@@BASE_PATH@@"
+            await exec(`sed -i 's#${placeholder}#${app.appName}#g' frontend/${dir}/webpack.common.js`)
 
             // webpack 
             try {
@@ -268,36 +278,44 @@ async function init() {
 
     
 
-
-        
-    
-
-   
     async function step3() {
         for (let brickName of app.bricks) {
             try {
                 console.log("DOCKER COMPOSE UP " + brickName)
-                //await exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`)
                 await exec(`cd bricks/${brickName} && docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml -p ${app.appName} up --build -d`)
             } catch(e) {
                 console.log(e)
             }
         }
-        // dirty fix: otherwise nginx was launch/ready too early 
-        //await exec(`docker stop ${app.appName.toLowerCase()}_nginx_1 && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker run -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/conf.d:/etc/nginx/conf.d -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/nginx/nginx.conf:/etc/nginx/nginx.conf -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/app/dist:/app/dist -v ${process.env.BASE_PATH}mag/mag-engine/apps/${app.appName}/frontend/admin/dist:/admin/dist -p ${app.port}:80 --link ${app.appName.toLowerCase()}_${brickName}_api_1:${app.appName.toLowerCase()}_${brickName}_api_1 --net ${app.appName.toLowerCase()}_default  --name ${app.appName.toLowerCase()}_nginx_1 nginx`)
-        
     }
 
     
     await setup('app')
     await setup('admin')
     await step3()
-    setTimeout( () => {
-        exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`)
-    }, 3000)
 
+    setTimeout(
+        async () => {
+            try {
+                await exec(`docker start ${app.appName.toLowerCase()}_nginx_1`)
+                await exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`) 
+                await exec(`docker exec magengine_nginx_1 nginx -s reload`) 
+            } catch(e) {
+                console.log(e)
+            }
+        }, 
+    7000)
 
-
+    setTimeout(
+        async () => {
+            try {
+                await exec(`docker exec ${app.appName.toLowerCase()}_nginx_1 nginx -s reload`) 
+                await exec(`docker exec magengine_nginx_1 nginx -s reload`) 
+            } catch(e) {
+                console.log(e)
+            }
+        }, 
+    10000)
     
 }
 

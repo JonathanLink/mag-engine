@@ -9,7 +9,7 @@ ReactDOM.render(
     document.getElementById('app')
 )
 
-if (process.env.NODE_ENV !== 'production') {
+/*if (process.env.NODE_ENV !== 'production') {
     console.log('Looks like we are in development mode!');
 } else {
     if ('serviceWorker' in navigator) {
@@ -21,4 +21,4 @@ if (process.env.NODE_ENV !== 'production') {
           });
         });
       }
-}
+}*/

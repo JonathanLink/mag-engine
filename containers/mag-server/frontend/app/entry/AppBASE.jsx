@@ -106,7 +106,7 @@ class App extends Component {
                     
                         <Switch>
 
-                            <Route exact path="/" render={ (props) => { props.setBackButton = this.setBackButton; return React.createElement(@DEFAULT_BRICK@.routes[0].component, props); } }  />
+                            <Route exact path="/@@BASE_PATH@@/" render={ (props) => { props.setBackButton = this.setBackButton; return React.createElement(@DEFAULT_BRICK@.routes[0].component, props); } }  />
                             //@AUTO-GENERATED-ROUTE@
 
                         </Switch>

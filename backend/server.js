@@ -1,7 +1,6 @@
 'use strict';
 const Hapi = require('hapi')
 const mongoose = require('mongoose')
-mongoose.Promise = global.Promise
 const appModel = require('./src/api/models/app.js')
 const Boom = require('boom')
 const util = require('util')
@@ -36,7 +35,35 @@ async function main() {
         handler: async (request, h) => {
             console.log(JSON.parse(request.payload))
             try {
-                await appModel.create(JSON.parse(request.payload))
+                let app = JSON.parse(request.payload)
+                app.host = process.env.HOST
+                await appModel.create(app)
+
+                // update nginx 
+                let apps = await appModel.find({})
+                var routes = ''
+                for (let app of apps) {
+                    let appName = app.appName
+                    const route = '\\tlocation ~ ^/(admin/'+appName+'|'+appName+')/{\\n' 
+                        + '\\t\\trewrite ^(.*)/' + appName + '/(.*)$ $1/$2 break;\\n'
+                        + '\\t\\tproxy_pass http://' + appName + '_nginx_1:80;\\n' 
+                        + '\\t\\tproxy_http_version 1.1;\\n'
+                        + '\\t\\tproxy_set_header X-Real-IP $remote_addr;\\n'
+                        + '\\t\\tproxy_set_header Upgrade $http_upgrade;\\n'
+                        + '\\t\\tproxy_set_header Connection \'upgrade\';\\n'
+                        + '\\t\\tproxy_set_header Host $host;\\n'
+                        + '\\t\\tproxy_cache_bypass $http_upgrade;\\n'
+                        + '\\t\\tproxy_read_timeout 3600;\\n'
+                        + '\\t}\\n'
+                    routes += route
+                }
+
+                await exec(`rm -f /nginx/conf.d/default.conf && cp /nginx/conf.d/default.base /nginx/conf.d/default.conf`)
+                let placeholder = "@@APP_ROUTES@@"
+                await exec(`sed -i 's!${placeholder}!${routes}!g' /nginx/conf.d/default.conf`)
+
+              
+
             } catch (e) {
                 console.log(e)
             }
@@ -48,9 +75,8 @@ async function main() {
         method: 'GET',
         path:'/list/app', 
         handler: async (request, h) => {
-            console.log(request.payload)
             let list = await appModel.find({})
-            console.log(JSON.stringify(list))
+            console.log(JSON.stringify(list.reverse()))
             return JSON.stringify(list)
         }
     })
@@ -243,14 +269,25 @@ async function main() {
                 console.log('stopWebApp')
                 try {
                     let appPath = __dirname + '/apps/' + app.appName
+                    console.log(appPath)
                     const { stdout, stderr } = await exec(`cd ${appPath} && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker rmi -f ${app.appName.toLowerCase()}_nginx  && docker-compose down --rmi all --remove-orphans `)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
+
+                    try {
+                        await exec(`docker system prune -af`)
+                    } catch(e) {
+                        console.log(e)
+                    }
+                    
                     return stdout
                 } catch (e) {
                     console.log(e)
                     return Boom.badImplementation('internal error: cannot stop webapp')
                 }
+
+               
+
             }
 
             await dockerDownWebApp(app)
@@ -279,7 +316,7 @@ async function main() {
     
 
     // Open connection to mongo database
-    const databaseURL = 'mongodb://mongo/mag-engine'
+    const databaseURL = 'mongodb://db/mag-engine'
     await openDatabaseConnection(databaseURL)
 
 }

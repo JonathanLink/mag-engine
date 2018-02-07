@@ -77,8 +77,7 @@ async function main() {
         handler: async (request, h) => {
             console.log('fdsfsf')
             let list = await appModel.find({})
-            console.log(JSON.stringify(list))
-            return JSON.stringify(list)
+            return JSON.stringify(list.reverse())
         }
     })
 

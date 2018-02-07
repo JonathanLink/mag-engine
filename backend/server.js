@@ -27,6 +27,31 @@ async function openDatabaseConnection(databaseURL) {
 
 let brickRoutes
 
+async function updateRoutes() {
+     // update nginx 
+     let apps = await appModel.find({state: "running"})
+     var routes = ''
+     for (let app of apps) {
+         let appName = app.appName
+         const route = '\\tlocation ~ ^/(admin/'+appName+'|'+appName+')/{\\n' 
+             + '\\t\\trewrite ^(.*)/' + appName + '/(.*)$ $1/$2 break;\\n'
+             + '\\t\\tproxy_pass http://' + appName + '_nginx_1:80;\\n' 
+             + '\\t\\tproxy_http_version 1.1;\\n'
+             + '\\t\\tproxy_set_header X-Real-IP $remote_addr;\\n'
+             + '\\t\\tproxy_set_header Upgrade $http_upgrade;\\n'
+             + '\\t\\tproxy_set_header Connection \'upgrade\';\\n'
+             + '\\t\\tproxy_set_header Host $host;\\n'
+             + '\\t\\tproxy_cache_bypass $http_upgrade;\\n'
+             + '\\t\\tproxy_read_timeout 3600;\\n'
+             + '\\t}\\n'
+         routes += route
+     }
+
+     await exec(`rm -f /nginx/conf.d/default.conf && cp /nginx/conf.d/default.base /nginx/conf.d/default.conf`)
+     let placeholder = "@@APP_ROUTES@@"
+     await exec(`sed -i 's!${placeholder}!${routes}!g' /nginx/conf.d/default.conf`)
+}
+
 async function main() {
 
     server.route({
@@ -38,32 +63,6 @@ async function main() {
                 let app = JSON.parse(request.payload)
                 app.host = process.env.HOST
                 await appModel.create(app)
-
-                // update nginx 
-                let apps = await appModel.find({state: "running"})
-                var routes = ''
-                for (let app of apps) {
-                    let appName = app.appName
-                    const route = '\\tlocation ~ ^/(admin/'+appName+'|'+appName+')/{\\n' 
-                        + '\\t\\trewrite ^(.*)/' + appName + '/(.*)$ $1/$2 break;\\n'
-                        + '\\t\\tproxy_pass http://' + appName + '_nginx_1:80;\\n' 
-                        + '\\t\\tproxy_http_version 1.1;\\n'
-                        + '\\t\\tproxy_set_header X-Real-IP $remote_addr;\\n'
-                        + '\\t\\tproxy_set_header Upgrade $http_upgrade;\\n'
-                        + '\\t\\tproxy_set_header Connection \'upgrade\';\\n'
-                        + '\\t\\tproxy_set_header Host $host;\\n'
-                        + '\\t\\tproxy_cache_bypass $http_upgrade;\\n'
-                        + '\\t\\tproxy_read_timeout 3600;\\n'
-                        + '\\t}\\n'
-                    routes += route
-                }
-
-                await exec(`rm -f /nginx/conf.d/default.conf && cp /nginx/conf.d/default.base /nginx/conf.d/default.conf`)
-                let placeholder = "@@APP_ROUTES@@"
-                await exec(`sed -i 's!${placeholder}!${routes}!g' /nginx/conf.d/default.conf`)
-
-              
-
             } catch (e) {
                 console.log(e)
             }
@@ -89,6 +88,7 @@ async function main() {
             const state = request.params.state
             try {
                 await appModel.update({_id: appId}, {$set: {state: state}})
+                await updateRoutes()
             } catch (e) {
                 console.log(e)
                 throw Boom.unsupportedMediaType(e)
@@ -119,6 +119,12 @@ async function main() {
                     const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose start && docker start ${app.appName.toLowerCase()}_nginx_1`)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
+
+
+
+                   
+
+
                     return stdout
                 } catch (e) {
                     console.log(e)
@@ -151,6 +157,10 @@ async function main() {
                     const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose stop && docker stop ${app.appName.toLowerCase()}_nginx_1`)
                     console.log('stdout:', stdout)
                     console.log('stderr:', stderr)
+
+                    
+
+
                     return stdout
                 } catch (e) {
                     console.log(e)

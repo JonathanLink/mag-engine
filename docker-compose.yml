@@ -17,8 +17,8 @@ services:
       - db
     entrypoint: ./entrypoint.sh
     environment:
-      - BASE_PATH=/home/jlink/Documents/
-      - HOST=localhost 
+      - BASE_PATH=/opt/
+      - HOST=46.101.30.217 
       # 46.101.30.217
 
   db:

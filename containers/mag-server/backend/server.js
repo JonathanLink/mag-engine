@@ -232,10 +232,11 @@ async function init() {
             await exec(`sed -i 's#${placeholder}#${app.appName}#g' frontend/${dir}/webpack.common.js`)
 
             // webpack 
+	    console.log("webpack building...")
             try {
-                await exec(`cd frontend/${dir} && webpack --config webpack.prod.js`)        
+                await exec(`cd frontend/${dir} && npm run build-prod`)        
             } catch(e) {
-                
+               console.log(e) 
             }
 
             //if (dir === 'app') {

@@ -32,7 +32,7 @@ async function updateRoutes() {
      let apps = await appModel.find({state: "running"})
      var routes = ''
      for (let app of apps) {
-         let appName = app.appName
+         let appName = app.appName.toLowerCase()
          const route = '\\tlocation ~ ^/(admin/'+appName+'|'+appName+')/{\\n' 
              + '\\t\\trewrite ^(.*)/' + appName + '/(.*)$ $1/$2 break;\\n'
              + '\\t\\tproxy_pass http://' + appName + '_nginx_1:80;\\n' 
@@ -224,23 +224,27 @@ async function main() {
             }
 
             // 4. generate docker-compose.yml for the fresh new mag-server container
-            await exec(`rm ${appPath + '/docker-compose.yml'} & cp ${appPath + '/docker-compose.base.yml'} ${appPath + '/docker-compose.yml'}`)
-            let placeholder = '@MAG_SERVER_SERVER_PORT@'
-            await exec(`sed -i 's#${placeholder}#${serverPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
-            placeholder = '@MAG_SERVER_NGINX_PORT@'
-            await exec(`sed -i 's#${placeholder}#${nginxPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
-            placeholder = '@MAG_ENGINE_BASE_PATH@'
-            const magBasePath = process.env.BASE_PATH
-            await exec(`sed -i 's#${placeholder}#${magBasePath}#g' ${appPath + '/docker-compose.yml'}`)
-            placeholder = '@APP_NAME@'
-            await exec(`sed -i 's#${placeholder}#${app.appName}#g' ${appPath + '/docker-compose.yml'}`)
-            placeholder = '@SERVER_PORT_NUMBER@'
-            await exec(`sed -i 's#${placeholder}#${serverPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
-            placeholder = '@NGINX_PORT_NUMBER@'
-            await exec(`sed -i 's#${placeholder}#${nginxPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
-            placeholder = '@BASE_PATH@'
-            await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' ${appPath + '/docker-compose.yml'}`)
-            
+	    try {
+            	await exec(`rm -f ${appPath + '/docker-compose.yml'} && cp ${appPath + '/docker-compose.base.yml'} ${appPath + '/docker-compose.yml'}`)
+            	let placeholder = '@MAG_SERVER_SERVER_PORT@'
+            	await exec(`sed -i 's#${placeholder}#${serverPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
+            	placeholder = '@MAG_SERVER_NGINX_PORT@'
+            	await exec(`sed -i 's#${placeholder}#${nginxPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
+            	placeholder = '@MAG_ENGINE_BASE_PATH@'
+            	const magBasePath = process.env.BASE_PATH
+            	await exec(`sed -i 's#${placeholder}#${magBasePath}#g' ${appPath + '/docker-compose.yml'}`)
+            	placeholder = '@APP_NAME@'
+            	await exec(`sed -i 's#${placeholder}#${app.appName}#g' ${appPath + '/docker-compose.yml'}`)
+            	placeholder = '@SERVER_PORT_NUMBER@'
+            	await exec(`sed -i 's#${placeholder}#${serverPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
+            	placeholder = '@NGINX_PORT_NUMBER@'
+            	await exec(`sed -i 's#${placeholder}#${nginxPortNumber}#g' ${appPath + '/docker-compose.yml'}`)
+            	placeholder = '@BASE_PATH@'
+            	await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' ${appPath + '/docker-compose.yml'}`)
+	    } catch(e) {
+		console.log(e)
+	    }             
+
             // 5. docker-compose up
             async function startBrickService() {
                 try {

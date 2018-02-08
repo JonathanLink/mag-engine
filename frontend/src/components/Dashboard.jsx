@@ -185,7 +185,7 @@ class Dashboard extends Component {
                     <RowItem xs={8}>
                         { app.name }
                         <br/>
-                        <small>{ this.state.list[index].stateMessage } { (this.state.list[index].port < 0 || this.state.list[index].state !== 'running') ? '' : <span> : <a href={"http://"+ this.state.list[index].host + "/"+this.state.list[index].appName+'/'} target="_blank">app</a> | <a href={"http://"+ this.state.list[index].host + "/admin/" + this.state.list[index].appName+"/"} target="_blank">admin</a> </span>}  </small>
+                        <small>{ this.state.list[index].stateMessage } { (this.state.list[index].port < 0 || this.state.list[index].state !== 'running') ? '' : <span> : <a href={"http://"+ this.state.list[index].host + "/"+this.state.list[index].appName.toLowerCase()+'/'} target="_blank">app</a> | <a href={"http://"+ this.state.list[index].host + "/admin/" + this.state.list[index].appName.toLowerCase()+"/"} target="_blank">admin</a> </span>}  </small>
                     </RowItem>
                     <RowItem xs={1} style={ {textAlign: "left"} }>
                         { deleteButton }

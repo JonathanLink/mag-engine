@@ -12,4 +12,3 @@ WORKDIR ${workdir}
 #COPY . .
 
 #CMD npm start
-

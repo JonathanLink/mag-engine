@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon --ignore tmp/ --ignore frontend/ --ignore bricks/ -L server.js"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +14,7 @@
     "mongoose": "^4.13.6"
   },
   "devDependencies": {
-    "nodemon": "^1.12.5",
+    "forever": "^0.15.3",
     "webpack": "^3.10.0"
   }
 }

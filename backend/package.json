@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon --ignore apps/ -L server.js "
+    "start": "forever server.js "
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,6 @@
     "mongoose": "^4.13.6"
   },
   "devDependencies": {
-    "nodemon": "^1.12.5"
+    "forever": "^0.15.3"
   }
 }

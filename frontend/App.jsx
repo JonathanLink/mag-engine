@@ -53,7 +53,9 @@ class App extends Component {
         } else {
             this.state.newApp.appName = ""
         }
-        console.log(this.state.newApp)
+	this.state.newApp.color = ""
+	this.state.newApp.bricks = []
+	console.log(this.state.newApp)
     }
 
     getName = (name) => {

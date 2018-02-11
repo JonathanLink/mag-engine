@@ -50,8 +50,6 @@ async function updateRoutes() {
      await exec(`rm -f /nginx/conf.d/default.conf && cp /nginx/conf.d/default.base /nginx/conf.d/default.conf`)
      let placeholder = "@@APP_ROUTES@@"
      await exec(`sed -i 's!${placeholder}!${routes}!g' /nginx/conf.d/default.conf`)
-     // refresh nginx magengine
-     await exec(`docker exec magengine_nginx_1 nginx -s reload`)
 }
 
 async function main() {
@@ -103,6 +101,38 @@ async function main() {
         method: 'PUT',
         path:'/start/{appId}', 
         handler: async (request, h) => {
+            const appId = request.params.appId
+            let app
+            try {
+                app = await appModel.findOne( { _id: appId } )
+            } catch (e) {
+                console.log(e)
+                return Boom.badImplementation('internal error: cannot start app (step 0)')
+            } 
+
+            async function startWebApp(app) {
+                console.log('startWebApp')
+                try {
+                    let appPath = __dirname + '/apps/' + app.appName
+                    // nginx is start after because when it was it the docker-compose it was started before webapp static files were generated
+                    // fix: put back nginx inside docker-compose and then add a timer to execute docker exec ----nginx_1 nginx -s reload 
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose start && docker start ${app.appName.toLowerCase()}_nginx_1`)
+                    console.log('stdout:', stdout)
+                    console.log('stderr:', stderr)
+
+
+
+                   
+
+
+                    return stdout
+                } catch (e) {
+                    console.log(e)
+                    return Boom.badImplementation('internal error: cannot start webapp')
+                }
+            }
+
+            await startWebApp(app)
             return h.response()
         }
     })
@@ -111,6 +141,34 @@ async function main() {
         method: 'PUT',
         path:'/stop/{appId}', 
         handler: async (request, h) => {
+            const appId = request.params.appId
+            let app
+            try {
+                app = await appModel.findOne( { _id: appId } )
+            } catch (e) {
+                console.log(e)
+                return Boom.badImplementation('internal error: cannot stop app (step 0)')
+            } 
+
+            async function stopWebApp(app) {
+                console.log('stopWebApp')
+                try {
+                    let appPath = __dirname + '/apps/' + app.appName
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose stop && docker stop ${app.appName.toLowerCase()}_nginx_1`)
+                    console.log('stdout:', stdout)
+                    console.log('stderr:', stderr)
+
+                    
+
+
+                    return stdout
+                } catch (e) {
+                    console.log(e)
+                    return Boom.badImplementation('internal error: cannot stop webapp')
+                }
+            }
+
+            await stopWebApp(app)
             return h.response()
         }
     })
@@ -185,13 +243,16 @@ async function main() {
             	placeholder = '@BASE_PATH@'
             	await exec(`sed -i 's#${placeholder}#${process.env.BASE_PATH}#g' ${appPath + '/docker-compose.yml'}`)
 	    } catch(e) {
-		        console.log(e)
+		console.log(e)
 	    }             
 
             // 5. docker-compose up
             async function startBrickService() {
                 try {
-                    await exec(`cd ${appPath} && docker-compose up`)
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker-compose down --rmi all -v --remove-orphans && docker-compose build --no-cache && docker-compose  up`) // -p ${app.appName}
+                    console.log('stdout:', stdout)
+                    console.log('stderr:', stderr)
+                    return stdout
                 } catch (e) {
                     console.log(e)
                     return Boom.badImplementation('internal error: cannot start app (step 4)')
@@ -222,22 +283,23 @@ async function main() {
             async function dockerDownWebApp(app) {
                 console.log('stopWebApp')
                 try {
-                    console.log("rm all containers of that app")               
-                    await exec(`docker rm -f $(docker ps -q -f name=${app.appName.toLowerCase() + '_'})`)
-                } catch (e) {
-                    console.log(e)
-                    return Boom.badImplementation('internal error: cannot stop webapp')
-                }
+                    let appPath = __dirname + '/apps/' + app.appName
+                    console.log(appPath)
+                    const { stdout, stderr } = await exec(`cd ${appPath} && docker rm -f ${app.appName.toLowerCase()}_nginx_1 && docker rmi -f ${app.appName.toLowerCase()}_nginx  && docker-compose down --rmi all --remove-orphans `)
+                    console.log('stdout:', stdout)
+                    console.log('stderr:', stderr)
 
                     try {
-			            // general cleaning
-                        console.log("general docker cleaning")
                         await exec(`docker system prune -af`)
                     } catch(e) {
                         console.log(e)
                     }
                     
-                    
+                    return stdout
+                } catch (e) {
+                    console.log(e)
+                    return Boom.badImplementation('internal error: cannot stop webapp')
+                }
 
                
 
@@ -245,8 +307,9 @@ async function main() {
 
             await dockerDownWebApp(app)
             
+
             
-            // delete  app in mongodb and in the filesystem
+            // save app in mongodb
             let appPath = __dirname + '/apps/' + app.appName
             try {
                 await exec(`docker exec magengine_api_1 rm -rf ${appPath}`)

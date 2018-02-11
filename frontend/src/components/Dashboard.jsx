@@ -10,8 +10,8 @@ import {IconDelete} from "sq-web-icons";
 
 
 const TIME_INSTALLING = 70
-const TIME_STOPPING = 10
-const TIME_STARTING = 10
+const TIME_STOPPING = 1
+const TIME_STARTING = 1
 const TIME_DELETING = 5
 
 class Dashboard extends Component {

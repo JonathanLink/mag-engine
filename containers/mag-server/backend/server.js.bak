@@ -128,11 +128,11 @@ async function init() {
 
             let brickInfo
             try {
-		        console.log("read brick info from brick.json for " + brickName)
+		console.log("read brick info from brick.json for " + brickName)
                 brickInfo = await readFile(`frontend/${dir}/bricks/${brickName}/brick.json`  , 'utf8')
                 brickInfo = await JSON.parse(brickInfo)
                 console.log(brickInfo)
-                brickInfo.basePath =  app.host + '/' + app.appName.toLowerCase()
+                brickInfo.basePath =  app.host + '/' + app.appName
                 console.log(brickInfo)
                 await writeFile(`frontend/${dir}/bricks/${brickName}/brick.json`, JSON.stringify(brickInfo)  , 'utf8')
                 console.log(brickInfo)
@@ -242,20 +242,47 @@ async function init() {
             placeholder = "@@BRICK_MERGE_WEBPACK@@"
             await exec(`sed -i 's#${placeholder}#${webpackMergeBrickConfig}#g' frontend/${dir}/webpack.common.js`)
             placeholder = "@@BASE_PATH@@"
-            await exec(`sed -i 's#${placeholder}#${app.appName.toLowerCase()}#g' frontend/${dir}/webpack.common.js`)
-		
-	    if (dir === 'app') {
-            	// update nginx route
-	    	console.log("update nginx route of the app")
-            	await exec(`rm -f nginx/conf.d/default.conf && cp nginx/conf.d/default.base nginx/conf.d/default.conf`)
+            await exec(`sed -i 's#${placeholder}#${app.appName}#g' frontend/${dir}/webpack.common.js`)
 
-	        placeholder = "@SERVER_APP_SERVER_PORT@"
-                await exec(`sed -i 's#${placeholder}#${process.env.SERVER_PORT_NUMBER}#g' nginx/conf.d/default.conf`)      
+            // webpack 
+	    console.log("webpack building... " + dir)
+            try {
+                await exec(`cd frontend/${dir} && npm run build-prod`)        
+            } catch(e) {
+               console.log(e) 
+            }
+
+            //if (dir === 'app') {
+                // add manifest.json to dist folder
+                try {
+                    console.log("generate manifest.json for " + dir)
+                    await exec(`rm -f frontend/${dir}/dist/manifest.json && cp frontend/${dir}/entry/manifest.base.json frontend/${dir}/dist/manifest.json`)
+                    placeholder = "@@APP_SHORT_NAME@@"
+                    await exec(`sed -i 's!${placeholder}!${app.appName}!g' frontend/${dir}/dist/manifest.json`)
+                    placeholder = "@@APP_NAME@@"
+                    await exec(`sed -i 's!${placeholder}!${app.name}!g' frontend/${dir}/dist/manifest.json`)
+                    placeholder = "@@APP_COLOR@@"
+                    await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/dist/manifest.json`)
+
+                    // add favicon to dist folder 
+                    await exec(`rm -f frontend/${dir}/dist/favicon.ico && cp frontend/${dir}/entry/favicon.ico frontend/${dir}/dist/favicon.ico`)
+                } catch(e) {
+                    console.log(e)
+                }
+
+           //}
+
+            // update nginx route
+	    console.log("update nginx route of the app")
+            await exec(`rm -f nginx/conf.d/default.conf && cp nginx/conf.d/default.base nginx/conf.d/default.conf`)
+
+            placeholder = "@SERVER_APP_SERVER_PORT@"
+            await exec(`sed -i 's#${placeholder}#${process.env.SERVER_PORT_NUMBER}#g' nginx/conf.d/default.conf`)      
             
-            	// nginx api bricks
-            	placeholder = "@NGINX_BRICK_API@"
-            	await exec(`sed -i 's#${placeholder}#${nginxBrickAPIRoutes}#g' nginx/conf.d/default.conf`)
-	   }
+            // nginx api bricks
+            placeholder = "@NGINX_BRICK_API@"
+            await exec(`sed -i 's#${placeholder}#${nginxBrickAPIRoutes}#g' nginx/conf.d/default.conf`)
+
         /*} catch(e) {
             console.log(e)
         }*/
@@ -280,43 +307,6 @@ async function init() {
     
     await setup('app')
     await setup('admin')
-
-
-
-	async function compile(dir, app) {
-                try {
-                    await exec(`cd frontend/${dir} && npm run build-prod`)
-                    try {
-                        console.log("generate manifest.json for " + dir)
-                        await exec(`rm -f frontend/${dir}/dist/manifest.json && cp frontend/${dir}/entry/manifest.base.json frontend/${dir}/dist/manifest.json`)
-                        let placeholder = "@@APP_SHORT_NAME@@"
-                        await exec(`sed -i 's!${placeholder}!${app.appName}!g' frontend/${dir}/dist/manifest.json`)
-                        placeholder = "@@APP_NAME@@"
-                        await exec(`sed -i 's!${placeholder}!${app.name}!g' frontend/${dir}/dist/manifest.json`)
-                        placeholder = "@@APP_COLOR@@"
-                        await exec(`sed -i 's!${placeholder}!${app.color}!g' frontend/${dir}/dist/manifest.json`)
-                        placeholder = "@@START_URL@@"
-                        await exec(`sed -i 's!${placeholder}!${app.appName.toLowerCase()}!g' frontend/${dir}/dist/manifest.json`)
-                        // add favicon to dist folder 
-                        await exec(`rm -f frontend/${dir}/dist/favicon.ico && cp frontend/${dir}/entry/favicon.ico frontend/${dir}/dist/favicon.ico`)
-                   } catch(e) {
-                        console.log(e)
-                   }
-                } catch(e) {
-                    console.log(e) 
-                }
-            }
-            // webpack 
-            console.log("webpack building... ")
-            try {
-                //await exec(`cd frontend/${dir} && npm run build-prod`)
-                await Promise.all([compile('app', app), compile('admin', app)]) 
-            } catch(e) {
-               console.log(e) 
-            }
-
-
-
     await step3()
 
     setTimeout(
@@ -357,11 +347,11 @@ async function start() {
         process.exit(1)
     }
      // Open connection to mongo database
-    //const databaseURL = 'mongodb://mongo/mag-server'
-    //await openDatabaseConnection(databaseURL)
+    const databaseURL = 'mongodb://mongo/mag-server'
+    await openDatabaseConnection(databaseURL)
     console.log('Server running at:', server.info.uri)
 }
 
 
 init()
-start()
+//start()

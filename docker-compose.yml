@@ -18,7 +18,7 @@ services:
     entrypoint: ./entrypoint.sh
     environment:
       - BASE_PATH=/opt/
-      - HOST=46.101.30.217 
+      - HOST=magdev.ch 
       # 46.101.30.217
 
   db:
@@ -32,10 +32,12 @@ services:
     image: nginx
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd
       - ./frontend/dist:/dist
+      - /opt/wetty:/opt/wetty # wetty 
     depends_on:
       - api
     ports:
-      - 80:80
+      - 44380:80
     

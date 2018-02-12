@@ -9,7 +9,7 @@ import "./List.css"
 import {IconDelete} from "sq-web-icons";
 
 
-const TIME_INSTALLING = 70
+const TIME_INSTALLING = 90
 const TIME_STOPPING = 1
 const TIME_STARTING = 1
 const TIME_DELETING = 5

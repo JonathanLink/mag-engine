@@ -5,7 +5,7 @@ server {
     #charset koi8-r;
     #access_log  /var/log/nginx/host.access.log  main;
 	
-  
+    client_max_body_size 5M;  
    
     #location ~ ^\/(dashboard|new)  {
 	#    root /dist;

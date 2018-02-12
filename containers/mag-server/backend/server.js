@@ -11,7 +11,7 @@ const writeFile = util.promisify(require('fs').writeFile)
 const server = Hapi.Server({ 
     host: '0.0.0.0', 
     port: 8000,
-    routes: {cors: {origin: ['http://localhost:11000'] }}
+    routes: { cors: true }
 })
 
 
@@ -152,7 +152,7 @@ async function init() {
             webpackChunks = webpackChunks + `, "${brickName}"`
 
             // nginx brick api routes
-            nginxBrickAPIRoutes = nginxBrickAPIRoutes + `location /api/brick/${brickName} { \\n\\t\\t proxy_pass http://${app.appName.toLowerCase()}_${brickName}_api_1:8000; \\n\\t\\t proxy_http_version 1.1; \\n\\t\\t proxy_set_header Upgrade $http_upgrade; \\n\\t\\t proxy_set_header Connection "upgrade"; \\n\\t\\t proxy_set_header Host $host; \\n\\t\\t proxy_cache_bypass $http_upgrade; \\n\\t}\\n` 
+            nginxBrickAPIRoutes = nginxBrickAPIRoutes + `location /api/brick/${brickName} { \\nif ($request_method = OPTIONS ) {\\n\\tadd_header "Access-Control-Allow-Methods" "GET, POST, PUT, DELETE, OPTIONS, HEAD";\\n\\tadd_header "Access-Control-Allow-Headers" "Authorization, Origin, X-Requested-With, Content-Type, Accept";\\n\\treturn 204;\\n}\\n\\t\\t proxy_pass http://${app.appName.toLowerCase()}_${brickName}_api_1:8000; \\n\\t\\t proxy_http_version 1.1; \\n\\t\\t proxy_set_header Upgrade $http_upgrade; \\n\\t\\t proxy_set_header Connection "upgrade"; \\n\\t\\t proxy_set_header Host $host; \\n\\t\\t proxy_cache_bypass $http_upgrade; \\n\\t}\\n` 
 
         }
 
